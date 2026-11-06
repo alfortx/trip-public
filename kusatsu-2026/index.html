@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex">
+  <title>草津温泉旅行のしおり ♨️</title>
+  <style>
+    /* ── Reset & Base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; font-size: 16px; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Hiragino Kaku Gothic ProN',
+                   'Noto Sans JP', sans-serif;
+      background: #F0FAFA;
+      color: #333;
+      line-height: 1.65;
+    }
+    a { color: inherit; text-decoration: none; }
+
+    /* ── Site Header ── */
+    .site-header {
+      background: linear-gradient(150deg, #004D5E 0%, #00838F 55%, #26C6DA 100%);
+      color: #fff;
+      text-align: center;
+      padding: 2.2rem 1rem 1.8rem;
+    }
+    .site-header .hero-emoji { font-size: 2.2rem; letter-spacing: .1em; }
+    .site-header h1 { font-size: 1.45rem; font-weight: 800; margin: .4rem 0 .3rem; letter-spacing: .04em; }
+    .site-header .meta { font-size: .88rem; opacity: .9; }
+
+    /* ── TOC ── */
+    .toc {
+      background: #fff;
+      max-width: 480px;
+      margin: 1.3rem auto;
+      border-radius: 14px;
+      box-shadow: 0 2px 12px rgba(0,0,0,.09);
+      overflow: hidden;
+    }
+    .toc-title {
+      background: #00838F;
+      color: #fff;
+      padding: .65rem 1rem;
+      font-size: .82rem;
+      font-weight: 700;
+      letter-spacing: .06em;
+    }
+    .toc-list { list-style: none; }
+    .toc-list li { border-bottom: 1px solid #f0f0f0; }
+    .toc-list li:last-child { border-bottom: none; }
+    .toc-list a {
+      display: flex;
+      align-items: center;
+      padding: .7rem 1rem;
+      font-size: .92rem;
+      transition: background .15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .toc-list a:active { background: #E0F7FA; }
+    .day-badge {
+      background: #00ACC1;
+      color: #fff;
+      font-size: .68rem;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 4px;
+      margin-right: .65rem;
+      min-width: 3rem;
+      text-align: center;
+      flex-shrink: 0;
+    }
+    .toc-date { font-weight: 700; margin-right: .4rem; }
+    .toc-island { color: #555; font-size: .88rem; }
+    .toc-arrow { margin-left: auto; color: #00ACC1; font-size: 1rem; }
+
+    /* ── Day Section ── */
+    .day-section {
+      max-width: 480px;
+      margin: 1.3rem auto;
+      scroll-margin-top: .5rem;
+    }
+    .day-header {
+      background: linear-gradient(135deg, #006064, #00BCD4);
+      color: #fff;
+      border-radius: 14px 14px 0 0;
+      padding: 1rem 1.2rem .85rem;
+    }
+    .day-label {
+      font-size: .72rem;
+      font-weight: 700;
+      opacity: .8;
+      letter-spacing: .1em;
+      margin-bottom: .12rem;
+    }
+    .day-title { font-size: 1.18rem; font-weight: 800; }
+    .transport-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: .3rem;
+      background: rgba(255,255,255,.2);
+      border-radius: 20px;
+      padding: .22rem .75rem;
+      font-size: .78rem;
+      font-weight: 600;
+      margin-top: .45rem;
+    }
+
+    .day-body {
+      background: #fff;
+      border-radius: 0 0 14px 14px;
+      padding: 1rem 1.2rem 1.2rem;
+      box-shadow: 0 3px 10px rgba(0,0,0,.08);
+    }
+
+    /* ── Schedule Timeline ── */
+    .schedule { list-style: none; }
+    .schedule li {
+      display: flex;
+      gap: .85rem;
+      padding: .55rem 0;
+      border-bottom: 1px dashed #e5e5e5;
+      font-size: .88rem;
+    }
+    .schedule li:last-child { border-bottom: none; }
+    .s-time {
+      color: #007C8A;
+      font-weight: 700;
+      font-size: .78rem;
+      min-width: 3.1rem;
+      padding-top: .1rem;
+      flex-shrink: 0;
+      line-height: 1.4;
+    }
+    .s-act { flex: 1; }
+    .s-act strong { display: block; font-weight: 700; line-height: 1.45; }
+    .s-act small { color: #777; font-size: .8rem; display: block; margin-top: .1rem; line-height: 1.45; }
+    .shop-link { display: inline-block; margin-top: .25rem; font-size: .78rem; font-weight: 700; color: #00838F; text-decoration: underline; }
+
+    .day-note {
+      font-size: .8rem;
+      color: #777;
+      margin: .5rem 0 .6rem;
+      padding: .45rem .7rem;
+      background: #E0F7FA;
+      border-radius: 7px;
+      border-left: 3px solid #00BCD4;
+    }
+
+    /* ── Hotel Card ── */
+    .hotel-card {
+      margin-top: 1.1rem;
+      background: linear-gradient(135deg, #E0F7FA, #B2EBF2);
+      border-radius: 11px;
+      padding: 1rem 1.1rem;
+      border-left: 4px solid #00ACC1;
+    }
+    .hotel-label {
+      font-size: .7rem;
+      color: #006064;
+      font-weight: 700;
+      letter-spacing: .06em;
+      margin-bottom: .2rem;
+    }
+    .hotel-name {
+      font-size: 1rem;
+      font-weight: 800;
+      color: #003D4D;
+      margin-bottom: .45rem;
+      line-height: 1.4;
+    }
+    .hotel-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .3rem;
+      margin-bottom: .75rem;
+    }
+    .tag {
+      font-size: .7rem;
+      padding: 2px 8px;
+      border-radius: 10px;
+      background: rgba(255,255,255,.75);
+      color: #006064;
+      border: 1px solid #80DEEA;
+    }
+    .hotel-link {
+      display: inline-flex;
+      align-items: center;
+      gap: .35rem;
+      background: #00838F;
+      color: #fff;
+      padding: .5rem 1.1rem;
+      border-radius: 7px;
+      font-size: .85rem;
+      font-weight: 700;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .hotel-link:active { background: #006064; }
+
+    /* ── Free Day Card ── */
+    .free-option {
+      background: #FFF8E1;
+      border-radius: 9px;
+      padding: .7rem .9rem;
+      margin-bottom: .5rem;
+      border-left: 4px solid #FFB300;
+    }
+    .free-option .opt-label {
+      font-size: .72rem;
+      font-weight: 700;
+      color: #E65100;
+      letter-spacing: .05em;
+      margin-bottom: .2rem;
+    }
+    .free-option p { font-size: .88rem; color: #444; }
+    .free-option small { font-size: .8rem; color: #888; }
+
+    /* ── Home Banner ── */
+    .home-banner {
+      background: linear-gradient(135deg, #FFF3E0, #FFE0B2);
+      border-radius: 11px;
+      padding: 1rem 1.1rem;
+      margin-top: 1rem;
+      border-left: 4px solid #FF7043;
+      text-align: center;
+    }
+    .home-banner p { font-size: .92rem; color: #555; }
+    .home-banner .big { font-size: 1.5rem; margin-bottom: .3rem; }
+
+    /* ── Divider ── */
+    .section-divider {
+      text-align: center;
+      color: #80DEEA;
+      font-size: 1rem;
+      padding: .1rem 0;
+    }
+
+    /* ── Footer ── */
+    .site-footer {
+      max-width: 480px;
+      margin: 1.5rem auto 5.5rem;
+      padding: 1rem 1.2rem;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.06);
+      font-size: .78rem;
+      color: #999;
+    }
+    .site-footer p { margin-bottom: .25rem; }
+
+    /* ── Back to top ── */
+    .back-to-top {
+      position: fixed;
+      bottom: 1.3rem;
+      right: 1.3rem;
+      background: #00838F;
+      color: #fff;
+      width: 3rem;
+      height: 3rem;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      box-shadow: 0 4px 14px rgba(0,0,0,.22);
+      z-index: 100;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .back-to-top:active { background: #006064; }
+
+    /* ── Responsive ── */
+    @media (max-width: 510px) {
+      .toc, .day-section, .site-footer {
+        margin-left: .75rem;
+        margin-right: .75rem;
+      }
+    }
+
+    /* ── PC表示：目次を左に固定した2カラム構成 ── */
+    @media (min-width: 900px) {
+      .layout {
+        display: flex;
+        align-items: flex-start;
+        gap: 2rem;
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 0 1.5rem;
+      }
+      .toc {
+        position: sticky;
+        top: 1.5rem;
+        flex: 0 0 280px;
+        max-width: 280px;
+        margin: 1.3rem 0 0;
+      }
+      .main-content {
+        flex: 1 1 auto;
+        min-width: 0;
+      }
+      .main-content .day-section,
+      .main-content .site-footer {
+        max-width: 100%;
+        margin-left: 0;
+        margin-right: 0;
+      }
+    }
+  </style>
+</head>
+<body id="top">
+
+<!-- ════ HEADER ════ -->
+<header class="site-header">
+  <div class="hero-emoji">♨️🚗</div>
+  <h1>草津温泉旅行のしおり</h1>
+  <p class="meta">草津温泉・嬬恋・川場｜2026/11/6（金）〜11/8（日） 🚗 2名</p>
+</header>
+
+<div class="layout">
+
+<!-- ════ TOC ════ -->
+<nav class="toc" id="toc">
+  <div class="toc-title">📋 目次（タップで当日へジャンプ）</div>
+  <ul class="toc-list">
+    <li>
+      <a href="#day1">
+        <span class="day-badge">Day 1</span>
+        <span class="toc-date">11/6（金）</span>
+        <span class="toc-island">草津温泉</span>
+        <span class="toc-arrow">›</span>
+      </a>
+    </li>
+    <li>
+      <a href="#day2">
+        <span class="day-badge">Day 2</span>
+        <span class="toc-date">11/7（土）</span>
+        <span class="toc-island">鬼押出し園・嬬恋・川場</span>
+        <span class="toc-arrow">›</span>
+      </a>
+    </li>
+    <li>
+      <a href="#day3">
+        <span class="day-badge">Day 3</span>
+        <span class="toc-date">11/8（日）</span>
+        <span class="toc-island">高崎・前橋 → 帰宅</span>
+        <span class="toc-arrow">›</span>
+      </a>
+    </li>
+  </ul>
+</nav>
+
+<div class="main-content">
+
+<!-- ════ DAY 1 ════ -->
+<section class="day-section" id="day1">
+  <div class="day-header">
+    <div class="day-label">DAY 1</div>
+    <div class="day-title">11/6（金）（草津温泉）</div>
+    <div class="transport-badge">🚗 車 自宅 9〜10時 → 草津温泉 12時頃</div>
+  </div>
+  <div class="day-body">
+    <p class="day-note">🅿️ 宿の駐車場は5〜6台だけ。満車なら湯畑観光駐車場（湯畑から徒歩1〜2分）に案内される。チェックイン〜翌10時は宿が負担。</p>
+    <ul class="schedule">
+      <li>
+        <span class="s-time">9:00〜<br>10:00</span>
+        <span class="s-act">
+          <strong>🚗 出発</strong>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">12:00頃</span>
+        <span class="s-act">
+          <strong>♨️ 草津温泉に到着</strong>
+          <small>宿の駐車場に停められるか、宿に電話（0279-88-1126）で確認</small>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">12:00頃</span>
+        <span class="s-act">
+          <strong>🍗 とり彦で昼食</strong>
+          <small>湯畑近くの鶏料理の定食屋。焼きとり丼・鳥ソースカツ丼が人気。火曜定休</small>
+          <a class="shop-link" href="https://tabelog.com/gunma/A1004/A100402/10009223/" target="_blank" rel="noopener">🔗 食べログ</a>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">午後</span>
+        <span class="s-act">
+          <strong>🚶 湯畑周辺を散策・おやつ</strong>
+          <small>チェックインまでぶらぶら</small>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">15:00頃</span>
+        <span class="s-act">
+          <strong>🏨 チェックイン</strong>
+          <small>予約時の到着予定は17:00。早く着くなら一報を</small>
+          <a class="shop-link" href="https://travel.rakuten.co.jp/HOTEL/130704/130704.html" target="_blank" rel="noopener">🔗 楽天トラベル（平の家）</a>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">15:00〜</span>
+        <span class="s-act">
+          <strong>♨️ ひたすら風呂に入る</strong>
+          <small>白旗源泉100%掛け流しの大浴場（〜翌朝9時）／貸切風呂「牧水の湯」（最終入浴22時、空いていれば何度でも・現地予約）</small>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">18:00〜<br>19:00頃</span>
+        <span class="s-act">
+          <strong>🍚 まんてんで夕飯</strong>
+          <small>草津湯畑 まんてん（湯畑の近く、2階）。夜は17:00〜22:00（料理L.O. 21:00）。同系列の「弐番館」とは別のお店。釜めしが人気で混む。予約がなければ17:00の開店時に整理券</small>
+          <a class="shop-link" href="https://tabelog.com/gunma/A1004/A100402/10024205/" target="_blank" rel="noopener">🔗 食べログ</a>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">22:00</span>
+        <span class="s-act">
+          <strong>😴 就寝</strong>
+          <small>門限は23時</small>
+        </span>
+      </li>
+    </ul>
+
+    <div class="hotel-card">
+      <div class="hotel-label">🛏️ 1泊目（予約済み）</div>
+      <div class="hotel-name">草津温泉 お宿 平の家</div>
+      <div class="hotel-tags">
+        <span class="tag">湯畑まで徒歩0分</span>
+        <span class="tag">和モダン 28㎡（2024年改装）</span>
+        <span class="tag">朝食付（すいとん）</span>
+        <span class="tag">白旗源泉 掛け流し</span>
+        <span class="tag">貸切風呂あり</span>
+      </div>
+      <a class="hotel-link" href="https://travel.rakuten.co.jp/HOTEL/130704/130704.html" target="_blank" rel="noopener">
+        🔗 楽天トラベルで見る
+      </a>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider">•&nbsp;•&nbsp;•</div>
+
+<!-- ════ DAY 2 ════ -->
+<section class="day-section" id="day2">
+  <div class="day-header">
+    <div class="day-label">DAY 2</div>
+    <div class="day-title">11/7（土）（鬼押出し園・嬬恋 → 川場）</div>
+    <div class="transport-badge">🚗 車 草津 10時頃 → 鬼押出し園 → 嬬恋 → 川場 → 家</div>
+  </div>
+  <div class="day-body">
+    <p class="day-note">🅿️ 駐車場が宿負担なのは10時まで。それ以降は自分で払う。移動時間はおおよその目安なので、当日はナビで確認。</p>
+    <ul class="schedule">
+      <li>
+        <span class="s-time">8:30〜<br>10:30</span>
+        <span class="s-act">
+          <strong>🍳 朝食（宿）</strong>
+          <small>上州麺処「平の家」で、すいとん・ミニちまき・温泉たまご・焼きたてワッフル</small>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">10:00頃</span>
+        <span class="s-act">
+          <strong>🚗 チェックアウトして出発</strong>
+          <small>鬼押出し園まで車で約1時間（鬼押ハイウェーは普通車260円）</small>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">11:00頃</span>
+        <span class="s-act">
+          <strong>🌋 鬼押出し園</strong>
+          <small>1783年（天明3年）の浅間山の大噴火で流れ出た溶岩の岩海。遊歩道を歩いて30〜60分。大人700円、8:00〜17:00（最終入園16:30）</small>
+          <a class="shop-link" href="https://www.princehotels.co.jp/amuse/onioshidashi/" target="_blank" rel="noopener">🔗 公式サイト</a>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">12:15頃</span>
+        <span class="s-act">
+          <strong>🥬 食堂カフェ きゃべつごはんで昼食</strong>
+          <small>嬬恋村の直売所「あさまのいぶき」に併設。11:00〜16:00（L.O. 15:00）、木曜定休。予約は公式LINEか電話（0279-82-1283）。近くに鎌原観音堂もある</small>
+          <a class="shop-link" href="https://www.tsumagoi-kankou.jp/restaurant/%E9%A3%9F%E5%A0%82%E3%82%AB%E3%83%95%E3%82%A7-%E3%81%8D%E3%82%83%E3%81%B9%E3%81%A4%E3%81%94%E3%81%AF%E3%82%93" target="_blank" rel="noopener">🔗 嬬恋村観光協会</a>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">13:30頃</span>
+        <span class="s-act">
+          <strong>🚗 川場田園プラザへ出発</strong>
+          <small>約2時間の目安</small>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">15:30頃</span>
+        <span class="s-act">
+          <strong>🌾 道の駅 川場田園プラザ</strong>
+          <small>おやつ・買い物・休憩。お店はだいたい17時台まで（ファーマーズマーケットは18時まで）</small>
+          <a class="shop-link" href="https://www.denenplaza.co.jp/" target="_blank" rel="noopener">🔗 公式サイト</a>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">夕方</span>
+        <span class="s-act">
+          <strong>🍽️ 夕食</strong>
+          <small>お店は未定</small>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">夜</span>
+        <span class="s-act">
+          <strong>🏠 家に到着（泊）</strong>
+        </span>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<div class="section-divider">•&nbsp;•&nbsp;•</div>
+
+<!-- ════ DAY 3 ════ -->
+<section class="day-section" id="day3">
+  <div class="day-header">
+    <div class="day-label">DAY 3</div>
+    <div class="day-title">11/8（日）（高崎・前橋 → 帰宅）</div>
+  </div>
+  <div class="day-body">
+    <ul class="schedule">
+      <li>
+        <span class="s-time">昼</span>
+        <span class="s-act">
+          <strong>🍚 魅惑の白米（予約済み）</strong>
+          <small>土鍋炊きのごはんが主役の定食屋。2026年7月に高崎問屋町のビエント高崎へ移転。昼の部 11:00〜15:30（最終入店14:20）、木曜定休。予約可。駐車場はビエント高崎</small>
+          <a class="shop-link" href="https://tabelog.com/gunma/A1001/A100102/10026963/" target="_blank" rel="noopener">🔗 食べログ</a>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">午後</span>
+        <span class="s-act">
+          <strong>☕ 県庁でコーヒータイムとおやつ</strong>
+          <small>群馬県庁32階の「YAMATOYA COFFEE 32」。9:00〜19:00、無休（県庁舎の閉館日は休み）。珈琲ソフトクリームが人気。展望ホールは無料、県庁駐車場は2時間無料</small>
+          <a class="shop-link" href="https://tabelog.com/gunma/A1001/A100101/10021860/" target="_blank" rel="noopener">🔗 食べログ</a>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">午後</span>
+        <span class="s-act">
+          <strong>☕ 今万人珈琲（いまじんこーひー）でおやつ</strong>
+          <small>群馬のローカルチェーン。8:00〜22:00・無休の店が多い。ワッフル・プリンが人気</small>
+          <a class="shop-link" href="https://tabelog.com/gunma/A1001/A100101/10017353/" target="_blank" rel="noopener">🔗 食べログ（前橋上小出店）</a>
+          <a class="shop-link" href="https://tabelog.com/gunma/A1001/A100102/10014878/" target="_blank" rel="noopener">🔗 食べログ（前橋インター店）</a>
+          <a class="shop-link" href="https://tabelog.com/gunma/A1001/A100102/10000723/" target="_blank" rel="noopener">🔗 食べログ（高崎本店）</a>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">夜</span>
+        <span class="s-act">
+          <strong>🍝 はらっぱで夕飯</strong>
+          <small>高崎のスープパスタの名店。問屋町店は夜 17:00〜21:30、本店は 11:00〜21:30（L.O. 21:00）</small>
+          <a class="shop-link" href="https://tabelog.com/gunma/A1001/A100102/10014104/" target="_blank" rel="noopener">🔗 食べログ（高崎問屋町店）</a>
+          <a class="shop-link" href="https://tabelog.com/gunma/A1001/A100102/10017734/" target="_blank" rel="noopener">🔗 食べログ（本店）</a>
+          <a class="shop-link" href="https://harappa.co.jp/shop/" target="_blank" rel="noopener">🔗 公式（店舗一覧）</a>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">夕飯後</span>
+        <span class="s-act">
+          <strong>🚗 自宅へ</strong>
+        </span>
+      </li>
+    </ul>
+    <div class="home-banner">
+      <div class="big">🏠 ✨</div>
+      <p>おつかれさまでした！草津・嬬恋・川場、楽しかったね。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ════ FOOTER ════ -->
+<footer class="site-footer">
+  <p>宿（平の家）と魅惑の白米は予約済み。予約番号は記載しない。</p>
+  <p>⚠️ お店の営業時間・定休日は変わることがあります。最終確認は各お店の公式情報で行ってください。</p>
+  <p style="margin-top:.4rem; color:#bbb;">最終更新: 2026-11-06</p>
+</footer>
+
+</div><!-- /main-content -->
+</div><!-- /layout -->
+
+<!-- ════ Back to Top ════ -->
+<a href="#toc" class="back-to-top" title="目次へ戻る">▲</a>
+
+</body>
+</html>

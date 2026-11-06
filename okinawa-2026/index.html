@@ -1,0 +1,1938 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex">
+  <title>新婚旅行のしおり 🌺 沖縄・離島 2026</title>
+  <!-- 旅程マップ用（読み込めなくても本文は通常どおり表示されます） -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+  <style>
+    /* ── Reset & Base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; font-size: 16px; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Hiragino Kaku Gothic ProN',
+                   'Noto Sans JP', sans-serif;
+      background: #F0FAFA;
+      color: #333;
+      line-height: 1.65;
+    }
+    a { color: inherit; text-decoration: none; }
+
+    /* ── Site Header ── */
+    .site-header {
+      background: linear-gradient(150deg, #004D5E 0%, #00838F 55%, #26C6DA 100%);
+      color: #fff;
+      text-align: center;
+      padding: 2.2rem 1rem 1.8rem;
+    }
+    .site-header .hero-emoji { font-size: 2.2rem; letter-spacing: .1em; }
+    .site-header h1 { font-size: 1.45rem; font-weight: 800; margin: .4rem 0 .3rem; letter-spacing: .04em; }
+    .site-header .meta { font-size: .88rem; opacity: .9; }
+
+    /* ── TOC ── */
+    .toc {
+      background: #fff;
+      max-width: 480px;
+      margin: 1.3rem auto;
+      border-radius: 14px;
+      box-shadow: 0 2px 12px rgba(0,0,0,.09);
+      overflow: hidden;
+    }
+    .toc-title {
+      background: #00838F;
+      color: #fff;
+      padding: .65rem 1rem;
+      font-size: .82rem;
+      font-weight: 700;
+      letter-spacing: .06em;
+    }
+    .toc-list { list-style: none; }
+    .toc-list li { border-bottom: 1px solid #f0f0f0; }
+    .toc-list li:last-child { border-bottom: none; }
+    .toc-list a {
+      display: flex;
+      align-items: center;
+      padding: .7rem 1rem;
+      font-size: .92rem;
+      transition: background .15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .toc-list a:active { background: #E0F7FA; }
+    .day-badge {
+      background: #00ACC1;
+      color: #fff;
+      font-size: .68rem;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 4px;
+      margin-right: .65rem;
+      min-width: 3rem;
+      text-align: center;
+      flex-shrink: 0;
+    }
+    .toc-date { font-weight: 700; margin-right: .4rem; }
+    .toc-island { color: #555; font-size: .88rem; }
+    .toc-arrow { margin-left: auto; color: #00ACC1; font-size: 1rem; }
+
+    /* ── Day Section ── */
+    .day-section {
+      max-width: 480px;
+      margin: 1.3rem auto;
+      scroll-margin-top: .5rem;
+    }
+    .day-header {
+      background: linear-gradient(135deg, #006064, #00BCD4);
+      color: #fff;
+      border-radius: 14px 14px 0 0;
+      padding: 1rem 1.2rem .85rem;
+    }
+    .day-label {
+      font-size: .72rem;
+      font-weight: 700;
+      opacity: .8;
+      letter-spacing: .1em;
+      margin-bottom: .12rem;
+    }
+    .day-title { font-size: 1.18rem; font-weight: 800; }
+    .transport-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: .3rem;
+      background: rgba(255,255,255,.2);
+      border-radius: 20px;
+      padding: .22rem .75rem;
+      font-size: .78rem;
+      font-weight: 600;
+      margin-top: .45rem;
+    }
+
+    .day-body {
+      background: #fff;
+      border-radius: 0 0 14px 14px;
+      padding: 1rem 1.2rem 1.2rem;
+      box-shadow: 0 3px 10px rgba(0,0,0,.08);
+    }
+
+    /* ── Schedule Timeline ── */
+    .schedule { list-style: none; }
+    .schedule li {
+      display: flex;
+      gap: .85rem;
+      padding: .55rem 0;
+      border-bottom: 1px dashed #e5e5e5;
+      font-size: .88rem;
+    }
+    .schedule li:last-child { border-bottom: none; }
+    .s-time {
+      color: #007C8A;
+      font-weight: 700;
+      font-size: .78rem;
+      min-width: 3.1rem;
+      padding-top: .1rem;
+      flex-shrink: 0;
+      line-height: 1.4;
+    }
+    .s-act { flex: 1; }
+    .s-act strong { display: block; font-weight: 700; line-height: 1.45; }
+    .s-act small { color: #777; font-size: .8rem; display: block; margin-top: .1rem; line-height: 1.45; }
+
+    .day-note {
+      font-size: .8rem;
+      color: #777;
+      margin: .5rem 0 .6rem;
+      padding: .45rem .7rem;
+      background: #E0F7FA;
+      border-radius: 7px;
+      border-left: 3px solid #00BCD4;
+    }
+
+    /* ── Hotel Card ── */
+    .hotel-card {
+      margin-top: 1.1rem;
+      background: linear-gradient(135deg, #E0F7FA, #B2EBF2);
+      border-radius: 11px;
+      padding: 1rem 1.1rem;
+      border-left: 4px solid #00ACC1;
+    }
+    .hotel-label {
+      font-size: .7rem;
+      color: #006064;
+      font-weight: 700;
+      letter-spacing: .06em;
+      margin-bottom: .2rem;
+    }
+    .hotel-name {
+      font-size: 1rem;
+      font-weight: 800;
+      color: #003D4D;
+      margin-bottom: .45rem;
+      line-height: 1.4;
+    }
+    .hotel-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .3rem;
+      margin-bottom: .75rem;
+    }
+    .tag {
+      font-size: .7rem;
+      padding: 2px 8px;
+      border-radius: 10px;
+      background: rgba(255,255,255,.75);
+      color: #006064;
+      border: 1px solid #80DEEA;
+    }
+    .hotel-link {
+      display: inline-flex;
+      align-items: center;
+      gap: .35rem;
+      background: #00838F;
+      color: #fff;
+      padding: .5rem 1.1rem;
+      border-radius: 7px;
+      font-size: .85rem;
+      font-weight: 700;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .hotel-link:active { background: #006064; }
+
+    /* ── Free Day Card ── */
+    .free-option {
+      background: #FFF8E1;
+      border-radius: 9px;
+      padding: .7rem .9rem;
+      margin-bottom: .5rem;
+      border-left: 4px solid #FFB300;
+    }
+    .free-option .opt-label {
+      font-size: .72rem;
+      font-weight: 700;
+      color: #E65100;
+      letter-spacing: .05em;
+      margin-bottom: .2rem;
+    }
+    .free-option p { font-size: .88rem; color: #444; }
+    .free-option small { font-size: .8rem; color: #888; }
+
+    /* ── Home Banner ── */
+    .home-banner {
+      background: linear-gradient(135deg, #FFF3E0, #FFE0B2);
+      border-radius: 11px;
+      padding: 1rem 1.1rem;
+      margin-top: 1rem;
+      border-left: 4px solid #FF7043;
+      text-align: center;
+    }
+    .home-banner p { font-size: .92rem; color: #555; }
+    .home-banner .big { font-size: 1.5rem; margin-bottom: .3rem; }
+
+    /* ── Divider ── */
+    .section-divider {
+      text-align: center;
+      color: #80DEEA;
+      font-size: 1rem;
+      padding: .1rem 0;
+    }
+
+    /* ── Footer ── */
+    .site-footer {
+      max-width: 480px;
+      margin: 1.5rem auto 5.5rem;
+      padding: 1rem 1.2rem;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.06);
+      font-size: .78rem;
+      color: #999;
+    }
+    .site-footer p { margin-bottom: .25rem; }
+
+    /* ── Back to top ── */
+    .back-to-top {
+      position: fixed;
+      bottom: 1.3rem;
+      right: 1.3rem;
+      background: #00838F;
+      color: #fff;
+      width: 3rem;
+      height: 3rem;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      box-shadow: 0 4px 14px rgba(0,0,0,.22);
+      z-index: 100;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .back-to-top:active { background: #006064; }
+
+    /* ── Responsive ── */
+    @media (max-width: 510px) {
+      .toc, .map-section, .day-section, .site-footer {
+        margin-left: .75rem;
+        margin-right: .75rem;
+      }
+    }
+
+    /* ── PC表示：目次を左に固定した2カラム構成 ── */
+    @media (min-width: 900px) {
+      .layout {
+        display: flex;
+        align-items: flex-start;
+        gap: 2rem;
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 0 1.5rem;
+      }
+      .toc {
+        position: sticky;
+        top: 1.5rem;
+        flex: 0 0 280px;
+        max-width: 280px;
+        margin: 1.3rem 0 0;
+      }
+      .main-content {
+        flex: 1 1 auto;
+        min-width: 0;
+      }
+      .main-content .map-section,
+      .main-content .day-section,
+      .main-content .site-footer {
+        max-width: 100%;
+        margin-left: 0;
+        margin-right: 0;
+      }
+    }
+
+    /* ══════════ 洗濯メモ ══════════ */
+    .laundry-card {
+      margin: 1rem 0 .2rem;
+      padding: .85rem 1rem;
+      background: #F1F8E9;
+      border: 1px solid #C5E1A5;
+      border-left: 4px solid #7CB342;
+      border-radius: 12px;
+    }
+    .laundry-label {
+      font-size: .82rem;
+      font-weight: 700;
+      color: #33691E;
+      margin-bottom: .4rem;
+    }
+    .laundry-card dl {
+      margin: 0;
+      font-size: .82rem;
+      line-height: 1.85;
+    }
+    .laundry-card dt {
+      font-weight: 700;
+      color: #33691E;
+      margin-top: .35rem;
+    }
+    .laundry-card dd {
+      margin: 0 0 .1rem;
+      color: #3a4a2a;
+    }
+    .laundry-card .quote {
+      margin: .5rem 0 .2rem;
+      padding: .5rem .7rem;
+      background: #fff;
+      border-radius: 8px;
+      font-size: .78rem;
+      color: #555;
+      line-height: 1.75;
+    }
+    .laundry-card .quote .src {
+      display: block;
+      margin-top: .25rem;
+      font-size: .7rem;
+      color: #8a9a7a;
+    }
+    .laundry-card .todo {
+      margin: .5rem 0 0;
+      font-size: .78rem;
+      color: #E65100;
+      line-height: 1.7;
+    }
+    .laundry-link {
+      display: inline-block;
+      margin-top: .6rem;
+      padding: .35rem .8rem;
+      background: #7CB342;
+      color: #fff;
+      font-size: .78rem;
+      font-weight: 700;
+      text-decoration: none;
+      border-radius: 999px;
+    }
+
+    /* ══════════ 旅程マップ ══════════ */
+    .map-section {
+      max-width: 480px;
+      margin: 1.3rem auto;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 3px 10px rgba(0,0,0,.08);
+      overflow: hidden;
+    }
+    .map-head {
+      background: linear-gradient(135deg, #00838F 0%, #26C6DA 100%);
+      color: #fff;
+      padding: .7rem 1rem;
+      font-weight: 700;
+      font-size: 1rem;
+    }
+    .map-body { padding: .8rem; }
+
+    /* 島タブ：3等分グリッドで常に1行（360px幅でも折り返さない） */
+    .island-tabs {
+      display: grid;
+      /* 1fr はコンテンツが大きいと広がるので minmax(0,1fr) で厳密に3等分する */
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: .4rem;
+      list-style: none;
+      margin: 0 0 .7rem;
+      padding: 0;
+    }
+    .island-tab {
+      width: 100%;
+      min-width: 0;
+      padding: .55rem .2rem;
+      font-family: inherit;
+      font-size: .8rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-weight: 700;
+      line-height: 1.3;
+      color: #00838F;
+      background: #fff;
+      border: 1px solid #B2EBF2;
+      border-radius: 999px;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .island-tab[aria-selected="true"] {
+      background: #00838F;
+      color: #fff;
+      border-color: #00838F;
+    }
+
+    #map {
+      height: 52vh;
+      height: 52svh;          /* 非対応ブラウザは上の vh にフォールバック */
+      min-height: 300px;
+      max-height: 440px;
+      border-radius: 12px;
+      background: #dde;
+      z-index: 0;             /* back-to-top より下に置く */
+    }
+    .map-error {
+      display: none;
+      padding: 1.6rem 1rem;
+      text-align: center;
+      font-size: .85rem;
+      color: #E65100;
+      background: #FFF8E1;
+      border-radius: 12px;
+    }
+    /* スマホでは地図が縦スクロールを奪うため、2本指でのみパンさせる */
+    .map-wrap { position: relative; }
+    .pan-hint {
+      position: absolute; inset: 0;
+      display: none;
+      align-items: center; justify-content: center;
+      background: rgba(0,0,0,.45);
+      color: #fff; font-size: .9rem; font-weight: 700;
+      border-radius: 12px;
+      pointer-events: none;
+      z-index: 500;
+    }
+    .pan-hint.show { display: flex; }
+
+    /* 訪問順チップ（小さいピンを狙わずに選べる導線） */
+    .spot-chips {
+      display: flex;
+      gap: .35rem;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: .6rem .1rem .2rem;
+      margin: 0;
+      list-style: none;
+      scrollbar-width: thin;
+    }
+    .spot-chip {
+      flex: 0 0 auto;
+      font-family: inherit;
+      font-size: .74rem;
+      padding: .3rem .6rem;
+      border-radius: 999px;
+      border: 1px solid #B2EBF2;
+      background: #E0F7FA;
+      color: #006064;
+      cursor: pointer;
+      white-space: nowrap;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .spot-chip[aria-current="true"] {
+      background: #00838F; color: #fff; border-color: #00838F;
+    }
+
+    /* 選択したピンの詳細カード */
+    .spot-card {
+      margin-top: .7rem;
+      padding: .85rem .95rem;
+      min-height: 190px;       /* 切替時にページが跳ねないよう高さを確保 */
+      background: #F7FEFE;
+      border: 1px solid #B2EBF2;
+      border-left: 4px solid #00ACC1;
+      border-radius: 12px;
+    }
+    .spot-card .sc-when {
+      font-size: .76rem;
+      color: #00838F;
+      font-weight: 700;
+      margin: 0 0 .2rem;
+    }
+    .spot-card .sc-name {
+      font-size: 1.02rem;
+      font-weight: 700;
+      color: #004D5E;
+      margin: 0 0 .4rem;
+      line-height: 1.45;
+    }
+    .spot-card .sc-desc {
+      font-size: .84rem;
+      color: #444;
+      margin: 0 0 .5rem;
+      line-height: 1.75;
+    }
+    .spot-card .sc-notes {
+      margin: .5rem 0 0;
+      padding-left: 1.1rem;
+      font-size: .8rem;
+      color: #444;
+      line-height: 1.8;
+    }
+    .spot-card .sc-notes li { margin: .15rem 0; }
+    .spot-card .sc-notes strong { color: #00695C; }
+    .spot-card .sc-link {
+      display: inline-block;
+      margin-top: .6rem;
+      font-size: .8rem;
+      font-weight: 700;
+      color: #00838F;
+      text-decoration: none;
+    }
+    .spot-card .sc-links { display:flex; flex-wrap:wrap; gap:.4rem .9rem; margin:.6rem 0 0; font-size:.8rem; }
+    .spot-card .sc-links a, .s-links a { color:#00838F; font-weight:700; text-decoration:none; }
+    .s-links { display:flex; flex-wrap:wrap; gap:.2rem .9rem; margin-top:.25rem; font-size:.78rem; }
+    .spot-card .sc-placeholder {
+      color: #7a8a8a;
+      font-size: .88rem;
+      text-align: center;
+      padding: 2.6rem .5rem;
+      margin: 0;
+    }
+    .spot-card.is-rentacar { border-left-color: #E65100; background: #FFFCF5; }
+    .spot-card.is-hotel    { border-left-color: #FFB300; background: #FFFDF6; }
+    .spot-card.is-airport  { border-left-color: #37474F; background: #F7F9FA; }
+
+    /* マーカー：divIcon は幅0なので中身で幅を作る必要がある */
+    .leaflet-marker-icon { width: auto !important; height: auto !important; }
+    .pin {
+      display: inline-flex;
+      align-items: center;
+      gap: .15rem;
+      width: max-content;
+      white-space: nowrap;
+      font-family: inherit;
+      font-size: .78rem;
+      font-weight: 700;
+      line-height: 1;
+      color: #fff;
+      padding: .4rem .55rem;
+      border: 2px solid #fff;
+      border-radius: 999px;
+      box-shadow: 0 2px 6px rgba(0,0,0,.35);
+      transform: translate(-50%, -50%);
+    }
+    .pin-spot     { background: #00838F; }
+    .pin-hotel    { background: #FFB300; color: #4E2600; }
+    .pin-airport  { background: #37474F; }
+    .pin-rentacar { background: #E65100; }
+    .pin.selected {
+      transform: translate(-50%, -50%) scale(1.25);
+      box-shadow: 0 0 0 3px rgba(255,255,255,.95), 0 3px 8px rgba(0,0,0,.4);
+      z-index: 9999;
+    }
+    @media (max-width: 899px) {
+      .pin { padding: .5rem .65rem; font-size: .85rem; }  /* タップ目標を確保 */
+    }
+
+    .leaflet-container { font: inherit; }
+    .leaflet-tooltip.spot-tip {
+      border: none;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,.18);
+      padding: .4rem .6rem;
+      font-size: .8rem;
+      font-weight: 700;
+      color: #004D5E;
+      white-space: normal;
+      width: max-content;
+      max-width: 240px;
+    }
+    .map-note {
+      font-size: .72rem;
+      color: #8a9a9a;
+      margin: .5rem .1rem 0;
+      line-height: 1.6;
+    }
+
+    @media (min-width: 900px) {
+      #map { height: 520px; max-height: none; }
+      .island-tabs { grid-template-columns: repeat(3, auto); justify-content: start; }
+      .island-tab { padding: .5rem 1.2rem; font-size: .95rem; }
+    }
+  </style>
+</head>
+<body id="top">
+
+<!-- ════ HEADER ════ -->
+<header class="site-header">
+  <div class="hero-emoji">🌺 🌊 🌴</div>
+  <h1>新婚旅行のしおり</h1>
+  <p class="meta">沖縄本島・宮古島 ＋ 大阪・有馬温泉・京都｜2026年10月17日（土）〜 24日（土）7泊8日 ✈️ 2名</p>
+</header>
+
+<div class="layout">
+
+<!-- ════ TOC ════ -->
+<nav class="toc" id="toc">
+  <div class="toc-title">📋 目次（タップで当日へジャンプ）</div>
+  <ul class="toc-list">
+    <li>
+      <a href="#day1">
+        <span class="day-badge">Day 1</span>
+        <span class="toc-date">10/17（土）</span>
+        <span class="toc-island">沖縄本島</span>
+        <span class="toc-arrow">›</span>
+      </a>
+    </li>
+    <li>
+      <a href="#day2">
+        <span class="day-badge">Day 2</span>
+        <span class="toc-date">10/18（日）</span>
+        <span class="toc-island">沖縄本島</span>
+        <span class="toc-arrow">›</span>
+      </a>
+    </li>
+    <li>
+      <a href="#day3">
+        <span class="day-badge">Day 3</span>
+        <span class="toc-date">10/19（月）</span>
+        <span class="toc-island">宮古島</span>
+        <span class="toc-arrow">›</span>
+      </a>
+    </li>
+    <li>
+      <a href="#day4">
+        <span class="day-badge">Day 4</span>
+        <span class="toc-date">10/20（火）</span>
+        <span class="toc-island">宮古島 → 大阪・梅田</span>
+        <span class="toc-arrow">›</span>
+      </a>
+    </li>
+    <li>
+      <a href="#day5">
+        <span class="day-badge">Day 5</span>
+        <span class="toc-date">10/21（水）</span>
+        <span class="toc-island">大阪 → 有馬温泉</span>
+        <span class="toc-arrow">›</span>
+      </a>
+    </li>
+    <li>
+      <a href="#day6">
+        <span class="day-badge">Day 6</span>
+        <span class="toc-date">10/22（木）</span>
+        <span class="toc-island">有馬温泉 → 宇治</span>
+        <span class="toc-arrow">›</span>
+      </a>
+    </li>
+    <li>
+      <a href="#day7">
+        <span class="day-badge">Day 7</span>
+        <span class="toc-date">10/23（金）</span>
+        <span class="toc-island">祇園（ぎをん小森）→ 嵐山</span>
+        <span class="toc-arrow">›</span>
+      </a>
+    </li>
+    <li>
+      <a href="#day8">
+        <span class="day-badge">Day 8</span>
+        <span class="toc-date">10/24（土）</span>
+        <span class="toc-island">京都 → 帰路</span>
+        <span class="toc-arrow">›</span>
+      </a>
+    </li>
+  </ul>
+</nav>
+
+<div class="main-content">
+
+<!-- ════ 旅程マップ ════ -->
+<section class="map-section" id="map-section">
+  <div class="map-head">🗺️ 旅程マップ</div>
+  <div class="map-body">
+    <ul class="island-tabs" id="islandTabs" role="tablist"></ul>
+
+    <div class="map-wrap">
+      <div id="map"></div>
+      <div class="pan-hint" id="panHint">2本指で地図を動かせます</div>
+    </div>
+    <div class="map-error" id="mapError">
+      地図を読み込めませんでした。通信環境をご確認ください。<br>
+      （行程の内容はこの下から通常どおりご覧いただけます）
+    </div>
+
+    <ul class="spot-chips" id="spotChips"></ul>
+
+    <div class="spot-card" id="spotCard">
+      <p class="sc-placeholder">ピンをタップすると、ここに詳細が表示されます</p>
+    </div>
+
+    <p class="map-note">※ 地図の位置は目安です。実際の経路や所要時間は当日の交通状況で変わります。</p>
+  </div>
+</section>
+
+<!-- ════ DAY 1 ════ -->
+<section class="day-section" id="day1">
+  <div class="day-header">
+    <div class="day-label">DAY 1</div>
+    <div class="day-title">10月17日（土）沖縄本島</div>
+    <div class="transport-badge">✈️ JAL909 羽田09:40 → 那覇12:20</div>
+  </div>
+  <div class="day-body">
+    <p class="day-note">🎫 フライト予約済。到着が12:20のため、今回は南部（斎場御嶽・ニライカナイ橋）は見送り、恩納村へ直行します。<br>🏨 宿泊予約済。</p>
+    <ul class="schedule">
+      <li>
+        <span class="s-time">09:40</span>
+        <span class="s-act">
+          <strong>✈️ 羽田空港 出発</strong>
+          <small>JAL909便（羽田→那覇・約2時間40分）</small>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">12:20</span>
+        <span class="s-act">
+          <strong>🚗 那覇空港 到着 → レンタカー受取（12:30）</strong>
+          <small>沖縄オープンレンタカー那覇本店（予約済・マツダ デミオ XD）。到着後に店舗へ電話し、到着口を出て右突き当たりの「14番レンタカー送迎場所」から無料送迎。⚠️ 土曜は渋滞で40〜60分かかることがあるので、焦らず待とう。</small>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">13:30</span>
+        <span class="s-act">
+          <strong>🍔 美浜アメリカンビレッジ ＆ 昼食</strong>
+          <small>北谷町。那覇から恩納村へ北上する途中にある海沿いの街（レンタカー店から約26分。土曜は国道58号が混むので40〜60分みておく）。無料駐車場あり（約1,500台・旅行サイトの情報）。</small><span class="s-links"><a href="https://www.okinawa-americanvillage.com/" target="_blank" rel="noopener">🔗 公式サイト</a><a href="https://www.google.com/maps/search/?api=1&amp;query=%E7%BE%8E%E6%B5%9C%E3%82%A2%E3%83%A1%E3%83%AA%E3%82%AB%E3%83%B3%E3%83%93%E3%83%AC%E3%83%83%E3%82%B8" target="_blank" rel="noopener">📍 Googleマップ</a></span>
+          <small><b>昼食はハンバーガー「チャタン バーガー ベース アタビーズ」</b>（デポアイランド シーサイドビル1F・昼は9:00〜15:00・予約不可）。遅れて15時を過ぎそうなら、通し営業の「ジェッタバーガーマーケット」（ディストーションビル2F・10:00〜21:00）へ。</small><span class="s-links"><a href="https://tabelog.com/okinawa/A4703/A470304/47019850/" target="_blank" rel="noopener">🔗 アタビーズ 食べログ</a><a href="https://www.google.com/maps/search/?api=1&amp;query=%E3%83%81%E3%83%A3%E3%82%BF%E3%83%B3%20%E3%83%90%E3%83%BC%E3%82%AC%E3%83%BC%20%E3%83%99%E3%83%BC%E3%82%B9%20%E3%82%A2%E3%82%BF%E3%83%93%E3%83%BC%E3%82%BA" target="_blank" rel="noopener">📍 Googleマップ</a><a href="https://tabelog.com/okinawa/A4703/A470304/47007402/" target="_blank" rel="noopener">🔗 ジェッタバーガー 食べログ</a></span>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">15:00</span>
+        <span class="s-act">
+          <strong>🚗 恩納村へ北上</strong>
+          <small>国道58号で万座毛まで約35〜50分。</small>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">16:00</span>
+        <span class="s-act">
+          <strong>🌅 万座毛</strong>
+          <small>恩納村。象の鼻型の断崖絶壁と夕日の海。</small><span class="s-links"><a href="https://www.manzamo.jp/" target="_blank" rel="noopener">🔗 公式サイト</a><a href="https://www.google.com/maps/search/?api=1&amp;query=%E4%B8%87%E5%BA%A7%E6%AF%9B" target="_blank" rel="noopener">📍 Googleマップ</a></span>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">17:00</span>
+        <span class="s-act">
+          <strong>🏨 チェックイン</strong>
+          <small>カフー リゾート フチャク コンド・ホテル（恩納村・西海岸）</small>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">18:15</span>
+        <span class="s-act">
+          <strong>🪕 夕食 ― 純沖縄料理 三線の花（予約済）</strong>
+          <small>ホテルから約600m（同じ冨着地区）の沖縄料理・海鮮の店。2名・カウンターの<strong>三線ライブ席</strong>（19:30までの時間制）。料理は当日注文。ライブの30分前までに入店すること。<strong>無料送迎は電話で頼む必要あり</strong>（未手配）。送迎を使えば2人とも飲める。</small><span class="s-links"><a href="https://tabelog.com/okinawa/A4703/A470303/47014264/" target="_blank" rel="noopener">🔗 食べログ</a><a href="https://www.google.com/maps/search/?api=1&amp;query=%E4%B8%89%E7%B7%9A%E3%81%AE%E8%8A%B1%20%E6%81%A9%E7%B4%8D%E6%9D%91%E5%86%A8%E7%9D%80756-1" target="_blank" rel="noopener">📍 Googleマップ</a></span>
+        </span>
+      </li>
+    </ul>
+
+    <div class="hotel-card">
+      <div class="hotel-label">🛏️ 1泊目</div>
+      <div class="hotel-name">カフー リゾート フチャク コンド・ホテル</div>
+      <div class="hotel-tags">
+        <span class="tag">全室オーシャンビュー</span>
+        <span class="tag">ビーチ直結</span>
+        <span class="tag">プールあり</span>
+        <span class="tag">恩納村・西海岸</span>
+      </div>
+      <a class="hotel-link" href="https://travel.rakuten.co.jp/HOTEL/78239/78239.html" target="_blank" rel="noopener">
+        🔗 楽天トラベルで予約
+      </a>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider">•&nbsp;•&nbsp;•</div>
+
+<!-- ════ DAY 2 ════ -->
+<section class="day-section" id="day2">
+  <div class="day-header">
+    <div class="day-label">DAY 2</div>
+    <div class="day-title">10月18日（日）沖縄本島</div>
+  </div>
+  <div class="day-body">
+    <p class="day-note">🏨 宿泊予約済。</p>
+    <ul class="schedule">
+      <li>
+        <span class="s-time">08:00</span>
+        <span class="s-act"><strong>🍳 朝食（ホテル）</strong></span>
+      </li>
+      <li>
+        <span class="s-time">09:00</span>
+        <span class="s-act">
+          <strong>🚗 出発 → 北部へ</strong>
+          <small>恩納村から美ら海水族館まで車約1時間ドライブ。</small>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">10:00</span>
+        <span class="s-act">
+          <strong>🐋 沖縄美ら海水族館 ＆ 海洋博公園</strong>
+          <small>ジンベエザメ・マンタの大水槽「黒潮の海」は圧巻。イルカショー（無料）も。</small><span class="s-links"><a href="https://churaumi.okinawa/" target="_blank" rel="noopener">🔗 公式サイト</a><a href="https://www.google.com/maps/search/?api=1&amp;query=%E6%B2%96%E7%B8%84%E7%BE%8E%E3%82%89%E6%B5%B7%E6%B0%B4%E6%97%8F%E9%A4%A8" target="_blank" rel="noopener">📍 Googleマップ</a></span>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">12:15</span>
+        <span class="s-act">
+          <strong>☕ 昼食 ― 備瀬のカフェで軽めに（どれかで）</strong>
+          <small>ステーキはやめて軽めに（2026-10-18変更）。どれも備瀬のフクギ並木のすぐそばなので、食べたらそのまま並木の散策へ。水族館から車で約5分。営業時間はネットの情報で、店には未確認。</small>
+          <small><strong>cahaya bulan（チャハヤブラン）</strong> 海が見えるカフェ。7:30〜18:00・無休（公式）。駐車場は約50台の共有。平均1,300円ほど。</small><span class="s-links"><a href="https://cafe-cahayabulan.com/" target="_blank" rel="noopener">🔗 公式サイト</a><a href="https://www.google.com/maps/search/?api=1&amp;query=cahaya%20bulan%20%E5%82%99%E7%80%AC" target="_blank" rel="noopener">📍 Googleマップ</a></span>
+          <small><strong>カフェアンテナ</strong>（備瀬505） 10:00〜17:00。駐車場あり。</small><span class="s-links"><a href="https://tabelog.com/okinawa/A4702/A470202/47031131/" target="_blank" rel="noopener">🔗 食べログ</a><a href="https://www.google.com/maps/search/?api=1&amp;query=%E3%82%AB%E3%83%95%E3%82%A7%E3%82%A2%E3%83%B3%E3%83%86%E3%83%8A%20%E5%82%99%E7%80%AC" target="_blank" rel="noopener">📍 Googleマップ</a></span>
+          <small><strong>琉果</strong>（備瀬401） 11:00〜16:00・木曜休み。</small><span class="s-links"><a href="https://tabelog.com/okinawa/A4702/A470202/47029195/" target="_blank" rel="noopener">🔗 食べログ</a><a href="https://www.google.com/maps/search/?api=1&amp;query=%E7%90%89%E6%9E%9C%20%E5%82%99%E7%80%AC" target="_blank" rel="noopener">📍 Googleマップ</a></span>
+          <small><strong>古民家食堂ゆくる</strong>（備瀬520） 12:00〜16:00・不定休。</small><span class="s-links"><a href="https://www.google.com/maps/search/?api=1&amp;query=%E5%8F%A4%E6%B0%91%E5%AE%B6%E9%A3%9F%E5%A0%82%E3%82%86%E3%81%8F%E3%82%8B%20%E5%82%99%E7%80%AC" target="_blank" rel="noopener">📍 Googleマップ</a></span>
+          <small>水族館の中で済ませるなら、隣の美ら海プラザの「モーレ マーレ」（ジェラートとハンバーガーの軽食・10:00〜17:00）。</small>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">13:30</span>
+        <span class="s-act">
+          <strong>🌳 備瀬のフクギ並木</strong>
+          <small>水族館すぐ北。樹齢数百年のフクギが作る緑のトンネル。レンタサイクルで散策。</small><span class="s-links"><a href="https://www.okinawastory.jp/spot/1348" target="_blank" rel="noopener">🔗 観光情報</a><a href="https://www.google.com/maps/search/?api=1&amp;query=%E5%82%99%E7%80%AC%E3%81%AE%E3%83%95%E3%82%AF%E3%82%AE%E4%B8%A6%E6%9C%A8" target="_blank" rel="noopener">📍 Googleマップ</a></span>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">14:30</span>
+        <span class="s-act">
+          <strong>🌉 古宇利島</strong>
+          <small>全長1,960mの古宇利大橋を渡る絶景ドライブ。ハートロック・古宇利ビーチで海を満喫。</small><span class="s-links"><a href="https://www.nakijinson.jp/spot.php?id=22&amp;ct=1" target="_blank" rel="noopener">🔗 観光協会</a><a href="https://www.google.com/maps/search/?api=1&amp;query=%E5%8F%A4%E5%AE%87%E5%88%A9%E5%A4%A7%E6%A9%8B" target="_blank" rel="noopener">📍 Googleマップ</a></span>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">16:00</span>
+        <span class="s-act">
+          <strong>🚗 那覇へ南下</strong>
+          <small>沖縄自動車道を利用。約1時間30分。</small>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">18:00</span>
+        <span class="s-act">
+          <strong>🏨 チェックイン</strong>
+          <small>ハイアット リージェンシー 那覇（国際通り 徒歩3分）</small>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">18:30</span>
+        <span class="s-act">
+          <strong>🚗 レンタカー返却</strong>
+          <small>那覇市樋川の店舗へ。<strong>返却締切は19:30</strong>だが、19:15の夕食に間に合うよう早めに返す。返却後は国際通りまで送ってもらえる（店から朝陽屋までは約1.6km）。</small>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">19:15</span>
+        <span class="s-act">
+          <strong>🐷 夕食 ― 朝陽屋（予約済）</strong>
+          <small>那覇市久茂地（美栄橋）の豚しゃぶ・沖縄料理の店。2名・座敷（禁煙）、<b>2時間制</b>。料理は当日注文。サービス料5%とチャージ500円/人がかかる。車を返したあとなので飲める 🍺</small><span class="s-links"><a href="https://tabelog.com/okinawa/A4701/A470101/47029666/" target="_blank" rel="noopener">🔗 食べログ</a><a href="https://www.google.com/maps/search/?api=1&amp;query=%E6%9C%9D%E9%99%BD%E5%B1%8B%20%E9%82%A3%E8%A6%87%E5%B8%82%E4%B9%85%E8%8C%82%E5%9C%B02-19-17" target="_blank" rel="noopener">📍 Googleマップ</a></span>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">21:15</span>
+        <span class="s-act">
+          <strong>🛍️ 国際通りを散策しながらホテルへ</strong>
+          <small>泡盛・お土産の買い物。朝陽屋からホテルまでは約0.9km（歩いて10数分）。</small><span class="s-links"><a href="https://naha-kokusaidori.okinawa/" target="_blank" rel="noopener">🔗 国際通り</a><a href="https://www.makishi-public-market.jp/" target="_blank" rel="noopener">🔗 牧志公設市場</a><a href="https://www.google.com/maps/search/?api=1&amp;query=%E7%AC%AC%E4%B8%80%E7%89%A7%E5%BF%97%E5%85%AC%E8%A8%AD%E5%B8%82%E5%A0%B4" target="_blank" rel="noopener">📍 Googleマップ</a></span>
+        </span>
+      </li>
+    </ul>
+
+    <div class="hotel-card">
+      <div class="hotel-label">🛏️ 2泊目</div>
+      <div class="hotel-name">ハイアット リージェンシー 那覇 沖縄</div>
+      <div class="hotel-tags">
+        <span class="tag">全室禁煙</span>
+        <span class="tag">国際通り徒歩3分</span>
+        <span class="tag">屋外プールあり</span>
+        <span class="tag">那覇市街地</span>
+      </div>
+      <a class="hotel-link" href="https://travel.rakuten.co.jp/HOTEL/148000/148000.html" target="_blank" rel="noopener">
+        🔗 楽天トラベルで予約
+      </a>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider">•&nbsp;•&nbsp;•</div>
+
+<!-- ════ DAY 3 ════ -->
+<section class="day-section" id="day3">
+  <div class="day-header">
+    <div class="day-label">DAY 3</div>
+    <div class="day-title">10月19日（月）宮古島</div>
+    <div class="transport-badge">✈️ ANA1723 那覇09:45 → 宮古10:35</div>
+  </div>
+  <div class="day-body">
+    <p class="day-note">🎫 フライト予約済。<br>🏨 宿泊予約済（ホテルブリーズベイマリーナ・1泊。10/20 の分は台風回避のためキャンセル済み）。</p>
+    <ul class="schedule">
+      <li>
+        <span class="s-time">07:30</span>
+        <span class="s-act"><strong>🍳 朝食（ホテル）</strong></span>
+      </li>
+      <li>
+        <span class="s-time">08:15</span>
+        <span class="s-act">
+          <strong>🧳 チェックアウト → 那覇空港へ</strong>
+          <small>レンタカーは前夜に返却済み。空港へはゆいレール（牧志駅 → 那覇空港駅・約12分／270円）またはタクシー（約15分・2,000円前後）で。</small>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">09:45</span>
+        <span class="s-act">
+          <strong>✈️ 那覇空港 出発</strong>
+          <small>那覇 → 宮古島（ANA1723・飛行時間 約50分）</small>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">10:35</span>
+        <span class="s-act">
+          <strong>🏝️ 宮古空港 到着 → レンタカー受取（11:00）</strong>
+          <small>ユニバースレンタカー宮古島空港店（予約済・BMW Mスポーツ）。空港から店舗へは<strong>タクシーで約5分、代金は店舗が負担</strong>（空港からの直送のみ・要領収書）。満車なら店舗へ電話すれば送迎車が来る。</small>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">11:30</span>
+        <span class="s-act">
+          <strong>🍜 昼食 ― 古謝そば屋（次点：大和食堂）</strong>
+          <small>どちらも宮古そばの老舗で、予約不可・駐車場あり。<br>
+          <b>古謝そば屋</b>（平良下里）11:00〜16:00・水曜休み。</small><span class="s-links"><a href="https://tabelog.com/okinawa/A4705/A470503/47000106/" target="_blank" rel="noopener">🔗 古謝そば屋 食べログ</a><a href="https://www.google.com/maps/search/?api=1&amp;query=%E5%8F%A4%E8%AC%9D%E3%81%9D%E3%81%B0%E5%B1%8B%20%E5%AE%AE%E5%8F%A4%E5%B3%B6" target="_blank" rel="noopener">📍 Googleマップ</a></span>
+          <small><b>大和食堂</b>（平良西里）9:40〜16:00・火曜休み。混んでいたらこちらへ。</small><span class="s-links"><a href="https://tabelog.com/okinawa/A4705/A470503/47000267/" target="_blank" rel="noopener">🔗 大和食堂 食べログ</a><a href="https://www.google.com/maps/search/?api=1&amp;query=%E5%A4%A7%E5%92%8C%E9%A3%9F%E5%A0%82%20%E5%AE%AE%E5%8F%A4%E5%B3%B6%20%E5%B9%B3%E8%89%AF%E8%A5%BF%E9%87%8C" target="_blank" rel="noopener">📍 Googleマップ</a></span>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">12:50</span>
+        <span class="s-act">
+          <strong>🚗 与那覇前浜ビーチへ（現地集合）</strong>
+          <small>平良から車で約20分（目安）。ホテルには寄らず直行。水着は服の下に着ておき、タオル・着替えを持って行く。集合場所は予約の確認画面で見ておく。</small>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">13:30</span>
+        <span class="s-act">
+          <strong>🏄 与那覇前浜ビーチ バナナボート＋SAP（スタンドアップパドル）</strong>
+          <small>シギラ公式予約の「前浜ビーチでマリンジェット」（バナナボート等3種・約2時間）にSUPオプションを追加。<b>13:30の回・現地集合</b>。15:30ごろ終了の見込み。</small><span class="s-links"><a href="https://act.shigira.com/top/products/c8c6e3e2-ec5c-556d-b706-ebb693c09440?lng=ja-JP" target="_blank" rel="noopener">🔗 予約ページ（シギラ公式）</a><a href="https://miyako-guide.net/spots/spots-785/" target="_blank" rel="noopener">🔗 観光協会</a><a href="https://www.google.com/maps/search/?api=1&amp;query=%E4%B8%8E%E9%82%A3%E8%A6%87%E5%89%8D%E6%B5%9C%E3%83%93%E3%83%BC%E3%83%81" target="_blank" rel="noopener">📍 Googleマップ</a></span>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">15:45</span>
+        <span class="s-act">
+          <strong>🌉 来間大橋を渡って来間島へ（空き時間の寄り道）</strong>
+          <small>前浜のすぐ南、車で数分。橋の上から前浜を振り返る景色がきれい。</small>
+          <small><b>竜宮城展望台</b>：来間島の高台。前浜・来間大橋・宮古島を一望（無料）。</small><span class="s-links"><a href="https://www.google.com/maps/search/?api=1&amp;query=%E7%AB%9C%E5%AE%AE%E5%9F%8E%E5%B1%95%E6%9C%9B%E5%8F%B0%20%E6%9D%A5%E9%96%93%E5%B3%B6" target="_blank" rel="noopener">📍 Googleマップ</a></span>
+          <small><b>農家れすとらん 楽園の果実</b>（友人のおすすめ）：完熟マンゴーのパフェなど。11:00〜18:00・火曜休み → 月曜OK。代わりに屋外カフェ <b>PANIPANI</b> も（友人のおすすめ・営業は要確認）。</small><span class="s-links"><a href="https://maps.app.goo.gl/8pdHPS5ApA99KWZf7" target="_blank" rel="noopener">📍 楽園の果実</a><a href="https://maps.app.goo.gl/e5bnUNhQSV8aT1kA6" target="_blank" rel="noopener">📍 PANIPANI</a></span>
+          <small><b>長間浜</b>：来間島の西側の静かなビーチ。人が少なく、のんびりできる。</small><span class="s-links"><a href="https://www.google.com/maps/search/?api=1&amp;query=%E9%95%B7%E9%96%93%E6%B5%9C%20%E6%9D%A5%E9%96%93%E5%B3%B6" target="_blank" rel="noopener">📍 Googleマップ</a></span>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">16:50</span>
+        <span class="s-act">
+          <strong>🏨 ホテルブリーズベイマリーナ チェックイン・シャワー</strong>
+          <small>来間島から車で約20分（目安）。予約の到着予定は17:30なので早めでも問題ない。着替えて一息。</small>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">17:40</span>
+        <span class="s-act">
+          <strong>🌅 前浜へ戻ってサンセット</strong>
+          <small>ホテルから車で約20分。西向きビーチ。<b>この日の日没は18:09</b>（国立天文台）。18:15ごろ平良へ向かう。</small>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">19:00</span>
+        <span class="s-act">
+          <strong>🥩 夕食 ― 平良の市街地でステーキ（どれかで）</strong>
+          <small>前浜から車で約20分。<b>車で行くので運転する人は飲めない</b>（レンタカー返却は翌日）。予約してから向かう。営業時間はネットの情報で、店には未確認。</small>
+          <small><b>宮古牛 鉄板焼 ユキシオステーキ</b>（平良久貝）宮古牛の鉄板焼。夜17:00〜22:00・年中無休。<b>公式サイトでネット予約できる</b>・0980-79-7978。</small><span class="s-links"><a href="https://yukishio-steak-miyako.foodre.jp/" target="_blank" rel="noopener">🔗 公式サイト（予約）</a><a href="https://www.google.com/maps/search/?api=1&amp;query=%E3%83%A6%E3%82%AD%E3%82%B7%E3%82%AA%E3%82%B9%E3%83%86%E3%83%BC%E3%82%AD%20%E5%AE%AE%E5%8F%A4%E5%B3%B6" target="_blank" rel="noopener">📍 Googleマップ</a></span>
+          <small><b>キャプテンメリアン</b>（平良西里）地元で人気の老舗ステーキハウス。17:00〜22:00（L.O.21:00）・日曜休み → 月曜OK。予約推奨・0980-72-7815。</small><span class="s-links"><a href="https://captain-marians.com/" target="_blank" rel="noopener">🔗 公式サイト</a><a href="https://www.google.com/maps/search/?api=1&amp;query=%E3%82%AD%E3%83%A3%E3%83%97%E3%83%86%E3%83%B3%E3%83%A1%E3%83%AA%E3%82%A2%E3%83%B3%20%E5%AE%AE%E5%8F%A4%E5%B3%B6" target="_blank" rel="noopener">📍 Googleマップ</a></span>
+          <small><b>ダグズ・グリル</b>（平良西里）落ち着いた雰囲気のグリル。18:00〜23:00（料理L.O.21:30）・定休日なし。0980-79-7070。</small><span class="s-links"><a href="https://www.google.com/maps/search/?api=1&amp;query=%E3%83%80%E3%82%B0%E3%82%BA%E3%82%B0%E3%83%AA%E3%83%AB%20%E5%AE%AE%E5%8F%A4%E5%B3%B6" target="_blank" rel="noopener">📍 Googleマップ</a></span>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">20:30</span>
+        <span class="s-act">
+          <strong>🚗 ホテルへ</strong>
+          <small>平良からシギラまで車で約25〜30分。</small>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">21:00</span>
+        <span class="s-act">
+          <strong>🧺 洗濯タイム</strong>
+          <small>ここまで3泊分。ここで洗っておけば、旅の後半を身軽に過ごせる。<strong>部屋のテレビで空き状況を確認してから</strong>向かうと待たずに済む。連泊なので、乾ききらない物は部屋干しで翌日まで乾かせる。</small>
+        </span>
+      </li>
+    </ul>
+
+    <div class="laundry-card">
+      <div class="laundry-label">🧺 洗濯のメモ（ホテルのコインランドリー）</div>
+      <dl>
+        <dt>台数</dt>
+        <dd>洗濯機 約10台。2人分・3泊ぶんなら2回ほどで足りる。</dd>
+        <dt>空き状況</dt>
+        <dd><strong>客室のテレビとスマホから確認できる</strong>。残り時間も分かるので、部屋で待って取りに行ける。</dd>
+        <dt>場所</dt>
+        <dd>本館。タワーウイングからは長い廊下と階段（10段ほど）を通るので、カゴか袋があると運びやすい。</dd>
+        <dt>⏰ 乾かし方</dt>
+        <dd>連泊なので急がなくてよい。乾燥機で乾ききらない物は<strong>部屋干しで翌日（4日目）まで</strong>乾かせる。4日目の夜は翌朝が早い（6:30朝食・7:15チェックアウト）ので、それまでに取り込む。</dd>
+        <dt>おしゃれ着</dt>
+        <dd>乾燥機は生地を傷めやすいので、洗濯ネットに入れて洗濯のみ → ハンガーで部屋干し。連泊なので翌日まで干しておける。</dd>
+      </dl>
+
+      <p class="quote">
+        「洗濯機も沢山あり(10台ほど)、使用状況と自分の残り洗濯時間なども部屋のテレビで確認できとても助かりました」<br>
+        「ランドリーも、空き状況が部屋のテレビでわかるし、スマホからも確認出来るし、とても良かったです！」
+        <span class="src">— 宿泊者のクチコミより（じゃらんnet）</span>
+      </p>
+
+      <p class="todo">⚠️ <strong>料金と利用時間は公式に記載がないため、チェックイン時（10/19）にフロントで確認しておくこと。</strong>洗剤の販売有無も一緒に聞いておくと確実。</p>
+
+      <a class="laundry-link" href="https://shigira.com/hotel/breezebay" target="_blank" rel="noopener">🔗 ホテル公式サイト</a>
+    </div>
+      <div class="hotel-card">
+      <div class="hotel-label">🛏️ 3泊目（10/20 の分はキャンセル済み）</div>
+      <div class="hotel-name">ホテルブリーズベイマリーナ＜宮古島＞</div>
+      <div class="hotel-tags">
+        <span class="tag">予約済</span>
+        <span class="tag">全室禁煙</span>
+        <span class="tag">シギラエリア・空港近い</span>
+        <span class="tag">オーシャンビュー</span>
+      </div>
+      <a class="hotel-link" href="https://hotel.travel.rakuten.co.jp/hotelinfo/plan/56659" target="_blank" rel="noopener">
+        🔗 楽天トラベルで詳細を見る
+      </a>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider">•&nbsp;•&nbsp;•</div>
+
+<!-- ════ DAY 4 ════ -->
+<section class="day-section" id="day4">
+  <div class="day-header">
+    <div class="day-label">DAY 4</div>
+    <div class="day-title">10月20日（火）宮古島 → 大阪・梅田</div>
+    <div class="transport-badge">✈️ NH1750 宮古13:25 → 関西15:40（遅れ後の時刻・定刻13:15→15:30）</div>
+  </div>
+  <div class="day-body">
+    <p class="day-note">🌀 台風30号が10/23ごろ先島諸島に近づく予報のため、<strong>石垣島をやめて宮古から関西へ</strong>（10/19 決定）。<br>🎫 フライト予約済（NH1750・フレックス）。ブリーズベイの10/20泊・郷家 はなれの夕食・石垣の宿とレンタカーはキャンセル済み。</p>
+    <ul class="schedule">
+      <li>
+        <span class="s-time">08:00</span>
+        <span class="s-act">
+          <strong>🍳 朝食・チェックアウト（ブリーズベイマリーナ）</strong>
+          <small>荷物はレンタカーに積んで出発。</small>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">09:20</span>
+        <span class="s-act">
+          <strong>🌉 伊良部大橋ドライブ</strong>
+          <small>全長3,540m、無料・日本最長の橋。橋の手前の展望スペースから宮古ブルーの絶景を撮影 📷</small><span class="s-links"><a href="https://www.miyakozima.net/tourist-info/irabubridge/" target="_blank" rel="noopener">🔗 観光情報</a><a href="https://www.google.com/maps/search/?api=1&amp;query=%E4%BC%8A%E8%89%AF%E9%83%A8%E5%A4%A7%E6%A9%8B" target="_blank" rel="noopener">📍 Googleマップ</a></span>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">09:40</span>
+        <span class="s-act">
+          <strong>🗼 牧山展望台</strong>
+          <small>伊良部島で一番高い場所の展望台。伊良部大橋・池間大橋・来間大橋の3つの橋を一望。駐車場から少し歩く。</small><span class="s-links"><a href="https://miyako-guide.net/spots/spots-874/" target="_blank" rel="noopener">🔗 観光協会</a><a href="https://www.google.com/maps/search/?api=1&amp;query=%E7%89%A7%E5%B1%B1%E5%B1%95%E6%9C%9B%E5%8F%B0" target="_blank" rel="noopener">📍 Googleマップ</a></span>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">10:20</span>
+        <span class="s-act">
+          <strong>🌀 通り池</strong>
+          <small>国指定天然記念物。陸の池が海底洞窟で海とつながる神秘の地形。遊歩道で徒歩約15分。</small><span class="s-links"><a href="https://miyakozima.net/tourist-info/toriike/" target="_blank" rel="noopener">🔗 観光情報</a><a href="https://www.google.com/maps/search/?api=1&amp;query=%E9%80%9A%E3%82%8A%E6%B1%A0%20%E4%BC%8A%E8%89%AF%E9%83%A8%E5%B3%B6%20%E4%B8%8B%E5%9C%B0%E5%B3%B6" target="_blank" rel="noopener">📍 Googleマップ</a></span>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">11:00</span>
+        <span class="s-act">
+          <strong>🪨 佐和田の浜</strong>
+          <small>日本の渚百選。大津波で運ばれた岩が遠浅の海に点在する独特の景観（白い砂浜の前浜とは別物）。</small><span class="s-links"><a href="https://miyako-guide.net/spots/spots-811/" target="_blank" rel="noopener">🔗 観光協会</a><a href="https://www.google.com/maps/search/?api=1&amp;query=%E4%BD%90%E5%92%8C%E7%94%B0%E3%81%AE%E6%B5%9C" target="_blank" rel="noopener">📍 Googleマップ</a></span>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">11:30</span>
+        <span class="s-act">
+          <strong>🚗 空港方面へ</strong>
+          <small>伊良部島から宮古空港まで車で約30分。</small>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">12:00</span>
+        <span class="s-act">
+          <strong>🚗 レンタカー返却（ユニバースレンタカー 宮古島空港店）</strong>
+          <small>返却後、店舗の送迎で宮古空港へ（約5分）。</small>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">12:20</span>
+        <span class="s-act">
+          <strong>✅ 宮古空港 チェックイン</strong>
+          <small>手荷物あずけの締切は出発20分前。</small>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">13:25</span>
+        <span class="s-act">
+          <strong>✈️ 宮古空港 出発</strong>
+          <small>NH1750・関西空港へ直行（約2時間15分）。</small>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">15:40</span>
+        <span class="s-act">
+          <strong>🛬 関西空港 到着</strong>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">16:10</span>
+        <span class="s-act">
+          <strong>🚌 梅田へ（リムジンバス）</strong>
+          <small>第1ターミナルのバス乗り場から「大阪駅前・梅田方面」行き。約60分・1,800円（夕方は道路の混み具合で延びる）。荷物をトランクに預けられるのでスーツケースでも楽。ホテルは大阪駅の西隣の福島駅前なので、<b>大阪駅の西側の停留所（ハービスOSAKA前）</b>で降りると近い。そこから徒歩約10分、荷物が重ければタクシーで数分。</small><span class="s-links"><a href="https://www.kate.co.jp/" target="_blank" rel="noopener">🔗 関西空港交通</a><a href="https://www.google.com/maps/search/?api=1&amp;query=%E5%A4%A7%E9%98%AA%E9%A7%85" target="_blank" rel="noopener">📍 大阪駅</a></span>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">17:15</span>
+        <span class="s-act">
+          <strong>🏨 ホテル阪神アネックス大阪にチェックイン</strong>
+          <small>JR福島駅から徒歩約3分。自動チェックイン機（楽天トラベルの予約確認ページのQRコードを使うと早い）。大阪府の宿泊税は別に現地で払う。</small>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">19:00</span>
+        <span class="s-act">
+          <strong>🍽️ 夕食（福島・梅田・お店は当日決める）</strong>
+          <small>ホテルのある福島は飲食店の多い街。梅田の駅ビル・地下街も歩いて行ける。</small>
+        </span>
+      </li>
+    </ul>
+
+    <div class="hotel-card">
+      <div class="hotel-label">🛏️ 4泊目</div>
+      <div class="hotel-name">ホテル阪神アネックス大阪</div>
+      <div class="hotel-tags">
+        <span class="tag">予約済</span>
+        <span class="tag">スーペリアツイン・禁煙</span>
+        <span class="tag">朝食付き（7:00〜10:00）</span>
+        <span class="tag">JR福島駅 徒歩3分</span>
+      </div>
+      <a class="hotel-link" href="https://travel.rakuten.co.jp/HOTEL/168596/168596.html" target="_blank" rel="noopener">
+        🔗 楽天トラベルで見る
+      </a>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider">•&nbsp;•&nbsp;•</div>
+
+<!-- ════ DAY 5 ════ -->
+<section class="day-section" id="day5">
+  <div class="day-header">
+    <div class="day-label">DAY 5</div>
+    <div class="day-title">10月21日（水）大阪 → 有馬温泉</div>
+    <div class="transport-badge">🚌 高速バス 大阪駅 → 有馬温泉（約1時間・時刻は当日決める）</div>
+  </div>
+  <div class="day-body">
+    <ul class="schedule">
+      <li>
+        <span class="s-time">09:00</span>
+        <span class="s-act">
+          <strong>🍳 朝食（ホテル1階の蕎麦酒房「ふくまる」・和洋ビュッフェ）</strong>
+          <small>7:00〜10:00（最終入店9:45）。</small>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">10:30</span>
+        <span class="s-act">
+          <strong>🧳 チェックアウト</strong>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">午前</span>
+        <span class="s-act">
+          <strong>🚌 大阪駅から高速バスで有馬温泉へ</strong>
+          <small>ホテルから JR で1駅の大阪駅へ（または徒歩約15分）。<b>大阪駅JR高速バスターミナル</b>から有馬温泉行き（新大阪経由・約1時間）。乗る便は当日決める。荷物はトランクへ。</small><span class="s-links"><a href="https://www.kosokubus.com/" target="_blank" rel="noopener">🔗 高速バスドットコム</a><a href="https://www.google.com/maps/search/?api=1&amp;query=%E5%A4%A7%E9%98%AA%E9%A7%85JR%E9%AB%98%E9%80%9F%E3%83%90%E3%82%B9%E3%82%BF%E3%83%BC%E3%83%9F%E3%83%8A%E3%83%AB" target="_blank" rel="noopener">📍 大阪駅JR高速バスターミナル</a></span>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">昼ごろ</span>
+        <span class="s-act">
+          <strong>♨️ 有馬温泉 到着・中の坊瑞苑に荷物を預ける</strong>
+          <small>バス停「有馬温泉」から温泉街はすぐ。</small>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">到着後</span>
+        <span class="s-act">
+          <strong>🍜 昼食（湯本坂のあたり）</strong>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">13:30</span>
+        <span class="s-act">
+          <strong>🚶 温泉街さんぽ</strong>
+          <small><b>湯本坂</b>（古い町並み・炭酸せんべい）→ <b>炭酸泉源公園</b>（炭酸が湧く泉源）→ <b>ねね橋</b>。坂が多いので歩きやすい靴で。</small><span class="s-links"><a href="https://www.arima-onsen.com/" target="_blank" rel="noopener">🔗 有馬温泉観光協会</a><a href="https://www.google.com/maps/search/?api=1&amp;query=%E6%B9%AF%E6%9C%AC%E5%9D%82%20%E6%9C%89%E9%A6%AC%E6%B8%A9%E6%B3%89" target="_blank" rel="noopener">📍 湯本坂</a><a href="https://www.google.com/maps/search/?api=1&amp;query=%E7%82%AD%E9%85%B8%E6%B3%89%E6%BA%90%E5%85%AC%E5%9C%92" target="_blank" rel="noopener">📍 炭酸泉源公園</a></span>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">14:30</span>
+        <span class="s-act">
+          <strong>🍰 スイーツ（候補）</strong>
+          <small>さんぽの途中でひと休み。</small><span class="s-links"><a href="https://tabelog.com/hyogo/A2801/A280112/28069730/" target="_blank" rel="noopener">🔗 候補 食べログ</a></span>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">15:00</span>
+        <span class="s-act">
+          <strong>🏨 中の坊瑞苑にチェックイン</strong>
+          <small>客室から浴衣で出るときは茶羽織を着る決まり。</small>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">16:00</span>
+        <span class="s-act">
+          <strong>♨️ 外湯「金の湯」「銀の湯」</strong>
+          <small>金の湯は鉄分を含む赤茶色の「金泉」、銀の湯は透明な「銀泉」。宿の温泉と入り比べ。</small><span class="s-links"><a href="https://www.google.com/maps/search/?api=1&amp;query=%E9%87%91%E3%81%AE%E6%B9%AF%20%E6%9C%89%E9%A6%AC%E6%B8%A9%E6%B3%89" target="_blank" rel="noopener">📍 金の湯</a><a href="https://www.google.com/maps/search/?api=1&amp;query=%E9%8A%80%E3%81%AE%E6%B9%AF%20%E6%9C%89%E9%A6%AC%E6%B8%A9%E6%B3%89" target="_blank" rel="noopener">📍 銀の湯</a></span>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">18:30</span>
+        <span class="s-act">
+          <strong>🍣 夕食はお寿司（宿の外で・要予約）</strong>
+          <small><b>朝食だけのプラン</b>。館内の和食処「旬彩 猪名野」は<b>水曜定休</b>なので、この日（10/21・水）は使えない。温泉街のお寿司屋さんを昼のうちに予約しておく。</small><span class="s-links"><a href="https://tabelog.com/hyogo/A2801/A280112/28000562/" target="_blank" rel="noopener">🔗 候補1 食べログ</a><a href="https://tabelog.com/hyogo/A2801/A280112/28055254/" target="_blank" rel="noopener">🔗 候補2 食べログ</a></span>
+        </span>
+      </li>
+    </ul>
+
+    <div class="hotel-card">
+      <div class="hotel-label">🛏️ 5泊目</div>
+      <div class="hotel-name">有馬温泉 中の坊瑞苑</div>
+      <div class="hotel-tags">
+        <span class="tag">予約済</span>
+        <span class="tag">数寄屋造りの和室・禁煙</span>
+        <span class="tag">朝食付き（和食か洋食）</span>
+        <span class="tag">夕食なし</span>
+        <span class="tag">チェックイン15:00</span>
+      </div>
+      <a class="hotel-link" href="https://travel.rakuten.co.jp/HOTEL/25288/25288.html" target="_blank" rel="noopener">
+        🔗 楽天トラベルで見る
+      </a>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider">•&nbsp;•&nbsp;•</div>
+
+<!-- ════ DAY 6 ════ -->
+<section class="day-section" id="day6">
+  <div class="day-header">
+    <div class="day-label">DAY 6</div>
+    <div class="day-title">10月22日（木）有馬温泉 → 宇治</div>
+    <div class="transport-badge">🚌 直通高速バス 有馬温泉11:30 → 京都駅八条口12:45ごろ（予約済）</div>
+  </div>
+  <div class="day-body">
+    <ul class="schedule">
+      <li>
+        <span class="s-time">07:30</span>
+        <span class="s-act">
+          <strong>♨️ 朝風呂・朝食（中の坊瑞苑）</strong>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">10:30</span>
+        <span class="s-act">
+          <strong>🧳 チェックアウト</strong>
+          <small>朝はゆっくり温泉。荷物を持って出発。</small>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">11:00</span>
+        <span class="s-act">
+          <strong>🍰 出発前のスイーツ（候補）</strong>
+          <small>バスまで30分ほど。<b>11:15にはバス停（有馬案内所の横）へ</b>。テイクアウトできればバスの中でも。</small><span class="s-links"><a href="https://tabelog.com/hyogo/A2801/A280112/28044218/" target="_blank" rel="noopener">🔗 候補 食べログ</a></span>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">11:30</span>
+        <span class="s-act">
+          <strong>🚌 直通高速バスで京都へ</strong>
+          <small><b>予約済み（楽天トラベル・2名）</b>。乗り場は<b>有馬温泉（有馬案内所横）</b>、降りるのは<b>京都駅八条口（H2のりば）</b>。約1時間15分・乗り換えなし。乗るときは楽天トラベルの予約確認ページのWEB乗車票かQRコードを見せる（乗車の24時間前から出せる）。定刻に出るので遅れないこと。荷物スペースは限られる。名神が混むと遅れる。</small><span class="s-links"><a href="https://www.keihanbus.jp/highway/line/kyoto-arima_onsen/" target="_blank" rel="noopener">🔗 京阪バス 京都〜有馬温泉</a></span>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">12:45</span>
+        <span class="s-act">
+          <strong>🧳 京都駅（八条口＝南口）に到着 → ロワジールホテル京都東寺に荷物を預ける</strong>
+          <small>宿は八条西口から歩いて約10〜12分（近鉄「東寺駅」から徒歩3分）。荷物が重ければタクシーで数分。チェックインは15:00からなので、まず荷物だけ預ける。</small><span class="s-links"><a href="https://www.google.com/maps/search/?api=1&amp;query=%E3%83%AD%E3%83%AF%E3%82%B8%E3%83%BC%E3%83%AB%E3%83%9B%E3%83%86%E3%83%AB%E4%BA%AC%E9%83%BD%E6%9D%B1%E5%AF%BA" target="_blank" rel="noopener">📍 Googleマップ</a></span>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">13:15</span>
+        <span class="s-act">
+          <strong>🍱 昼食（京都駅のあたり・または宇治に着いてから）</strong>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">14:00</span>
+        <span class="s-act">
+          <strong>🚃 JR奈良線で宇治へ</strong>
+          <small>京都駅から「みやこ路快速」で約17〜20分（普通だと約30分・240円）。宇治駅から平等院まで徒歩約10分。</small>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">14:30</span>
+        <span class="s-act">
+          <strong>🪷 平等院鳳凰堂（マスト）</strong>
+          <small>庭園と鳳翔館（ミュージアム）は8:45〜17:30（拝観料700円）。<b>鳳凰堂の中に入るのは別料金300円・20分ごとの入れ替え制</b>で、受付は16:10ごろまで。混むと早めに締め切るので、着いたら先に内部拝観の受付をする。</small><span class="s-links"><a href="https://www.byodoin.or.jp/" target="_blank" rel="noopener">🔗 平等院</a><a href="https://www.google.com/maps/search/?api=1&amp;query=%E5%B9%B3%E7%AD%89%E9%99%A2" target="_blank" rel="noopener">📍 Googleマップ</a></span>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">16:00</span>
+        <span class="s-act">
+          <strong>🍵 宇治で行きたいお店</strong>
+          <small>平等院を見たあとに。営業時間・定休日は食べログで確認しておく。</small><span class="s-links"><a href="https://tabelog.com/kyoto/A2607/A260701/26000722/" target="_blank" rel="noopener">🔗 食べログ</a></span>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">16:45</span>
+        <span class="s-act">
+          <strong>🌉 宇治橋・宇治川のほとりを散策</strong>
+          <small>宇治川の中州（塔の島・橘島）を歩いて対岸へ。時間があれば世界遺産の<b>宇治上神社</b>（候補）にも。</small><span class="s-links"><a href="https://www.google.com/maps/search/?api=1&amp;query=%E5%AE%87%E6%B2%BB%E6%A9%8B" target="_blank" rel="noopener">📍 宇治橋</a><a href="https://www.google.com/maps/search/?api=1&amp;query=%E5%AE%87%E6%B2%BB%E4%B8%8A%E7%A5%9E%E7%A4%BE" target="_blank" rel="noopener">📍 宇治上神社</a></span>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">17:45</span>
+        <span class="s-act">
+          <strong>🚃 JR奈良線で京都駅へ → 宿にチェックイン</strong>
+          <small>宇治駅から約20〜30分。京都駅の八条西口から宿まで歩いて約10分。</small>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">19:00</span>
+        <span class="s-act">
+          <strong>🍚 夕食 ― 竈炊き立てごはん 土井 京都駅八条口店</strong>
+          <small>竈で炊いたごはんの和食。京都駅の八条口すぐ（アスティロード京都 1F）で、宿へも歩いて帰れる。電話 075-634-8545。</small><span class="s-links"><a href="https://tabelog.com/kyoto/A2601/A260101/26026058/" target="_blank" rel="noopener">🔗 食べログ</a><a href="https://www.google.com/maps/search/?api=1&amp;query=%E7%AB%88%E7%82%8A%E3%81%8D%E7%AB%8B%E3%81%A6%E3%81%94%E3%81%AF%E3%82%93%20%E5%9C%9F%E4%BA%95%20%E4%BA%AC%E9%83%BD%E9%A7%85%E5%85%AB%E6%9D%A1%E5%8F%A3%E5%BA%97" target="_blank" rel="noopener">📍 Googleマップ</a></span>
+        </span>
+      </li>
+    </ul>
+
+    <div class="hotel-card">
+      <div class="hotel-label">🛏️ 6〜7泊目（2連泊）</div>
+      <div class="hotel-name">ロワジールホテル京都東寺</div>
+      <div class="hotel-tags">
+        <span class="tag">予約済</span>
+        <span class="tag">プレミアツイン（48㎡・リビング付き）・禁煙</span>
+        <span class="tag">朝食付き（7:00〜10:00）</span>
+        <span class="tag">サウナ付き大浴場</span>
+        <span class="tag">京都駅 八条西口 徒歩10分</span>
+      </div>
+      <p style="font-size:.85rem; margin:.5rem 0;">チェックイン15:00。京都市の宿泊税は別にチェックイン時に払う。大浴場は朝6時〜深夜1時。</p>
+      <a class="hotel-link" href="https://travel.rakuten.co.jp/HOTEL/187986/187986.html" target="_blank" rel="noopener">
+        🔗 楽天トラベルで見る
+      </a>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider">•&nbsp;•&nbsp;•</div>
+
+<!-- ════ DAY 7 ════ -->
+<section class="day-section" id="day7">
+  <div class="day-header">
+    <div class="day-label">DAY 7</div>
+    <div class="day-title">10月23日（金）祇園 → 嵐山</div>
+    <div class="transport-badge">🚂 嵯峨野トロッコ トロッコ嵯峨15:02 → 亀岡（予約済）</div>
+  </div>
+  <div class="day-body">
+    <p class="day-note">🗓️ <b>この日のマスト</b>：朝食ビュッフェ（1時間）／<b>10:40からぎをん小森に並び、11:00の開店でわらび餅</b>／嵐山を散策して<b>トロッコ15:02発（予約済み）</b>。昼食は道中で。</p>
+    <ul class="schedule">
+      <li>
+        <span class="s-time">08:00</span>
+        <span class="s-act">
+          <strong>🍳 朝食（ホテル・和洋ビュッフェ・1時間）</strong>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">09:15</span>
+        <span class="s-act">
+          <strong>🧳 宿を出て祇園へ</strong>
+          <small>タクシーで約15〜20分。電車ならJR奈良線で東福寺へ出て京阪に乗り換え、祇園四条から歩いて約5分（全部で約25〜30分）。</small>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">09:45</span>
+        <span class="s-act">
+          <strong>⛩️ 八坂神社・祇園白川（時間があれば）</strong>
+          <small>八坂神社からぎをん小森までは歩いて約10分。白川沿い・巽橋のあたりは朝が静か。<b>10:40にはお店の前へ</b>。</small><span class="s-links"><a href="https://www.google.com/maps/search/?api=1&amp;query=%E5%85%AB%E5%9D%82%E7%A5%9E%E7%A4%BE" target="_blank" rel="noopener">📍 八坂神社</a><a href="https://www.google.com/maps/search/?api=1&amp;query=%E5%B7%BD%E6%A9%8B%20%E7%A5%87%E5%9C%92" target="_blank" rel="noopener">📍 巽橋</a></span>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">10:40</span>
+        <span class="s-act">
+          <strong>🚶 ぎをん小森に並ぶ</strong>
+          <small>祇園新橋・白川沿いの甘味処。行列ができる店なので開店前から並ぶ。</small>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">11:00</span>
+        <span class="s-act">
+          <strong>🍡 ぎをん小森でわらび餅</strong>
+          <small>本わらび粉で作るわらび餅。わらびもちパフェも人気。お座敷から白川を眺められる。<br>営業時間・定休日（月曜休みとの情報あり）は掲載サイトで食い違うので、気になるときは電話（075-561-0504）で確認。</small><span class="s-links"><a href="https://tabelog.com/kyoto/A2601/A260301/26000280/" target="_blank" rel="noopener">🔗 食べログ</a><a href="https://www.google.com/maps/search/?api=1&amp;query=%E3%81%8E%E3%82%92%E3%82%93%E5%B0%8F%E6%A3%AE" target="_blank" rel="noopener">📍 ぎをん小森</a></span>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">11:45</span>
+        <span class="s-act">
+          <strong>🚃 阪急で嵐山へ</strong>
+          <small>四条大橋を渡って<b>京都河原町駅</b>まで歩いて約10分。阪急京都線で<b>桂</b>まで行き、嵐山線に乗り換えて<b>嵐山</b>へ（約25分）。阪急嵐山駅から渡月橋まで歩いて約5分。</small><span class="s-links"><a href="https://www.google.com/maps/search/?api=1&amp;query=%E4%BA%AC%E9%83%BD%E6%B2%B3%E5%8E%9F%E7%94%BA%E9%A7%85" target="_blank" rel="noopener">📍 阪急 京都河原町駅</a><a href="https://www.google.com/maps/search/?api=1&amp;query=%E9%98%AA%E6%80%A5%E5%B5%90%E5%B1%B1%E9%A7%85" target="_blank" rel="noopener">📍 阪急 嵐山駅</a></span>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">12:30</span>
+        <span class="s-act">
+          <strong>🌉 渡月橋 → 昼食（道中で）</strong>
+          <small>渡月橋を渡りながら、お店を見つけて昼食。湯豆腐なら天龍寺そばの<b>西山艸堂</b>や<b>湯豆腐 嵯峨野</b>も。わらび餅のあとなので軽めでも。</small><span class="s-links"><a href="https://rurubu.jp/andmore/spot/80027229" target="_blank" rel="noopener">🔗 西山艸堂（るるぶ）</a><a href="https://www.hotpepper.jp/strJ000108819/" target="_blank" rel="noopener">🔗 湯豆腐 嵯峨野</a><a href="https://www.google.com/maps/search/?api=1&amp;query=%E6%B8%A1%E6%9C%88%E6%A9%8B" target="_blank" rel="noopener">📍 渡月橋</a></span>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">13:30</span>
+        <span class="s-act">
+          <strong>⛩️ 天龍寺（曹源池庭園）→ 竹林の小径</strong>
+          <small>天龍寺の北門から出ると竹林の小径。竹林からトロッコ嵯峨駅までは歩いて約10分。</small><span class="s-links"><a href="https://www.google.com/maps/search/?api=1&amp;query=%E5%A4%A9%E9%BE%8D%E5%AF%BA" target="_blank" rel="noopener">📍 天龍寺</a><a href="https://www.google.com/maps/search/?api=1&amp;query=%E7%AB%B9%E6%9E%97%E3%81%AE%E5%B0%8F%E5%BE%84" target="_blank" rel="noopener">📍 竹林の小径</a></span>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">14:40</span>
+        <span class="s-act">
+          <strong>🚂 トロッコ嵯峨駅へ</strong>
+          <small>JR嵯峨嵐山駅のすぐ隣。発車の20分前には着いておく。</small>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">15:02</span>
+        <span class="s-act">
+          <strong>🚂 嵯峨野トロッコ列車（予約済）トロッコ嵯峨 → トロッコ亀岡</strong>
+          <small>約25分・保津川の渓谷沿いを走る。乗るときは予約したきっぷを見せる。</small><span class="s-links"><a href="https://www.sagano-kanko.co.jp/" target="_blank" rel="noopener">🔗 嵯峨野観光鉄道</a><a href="https://www.google.com/maps/search/?api=1&amp;query=%E3%83%88%E3%83%AD%E3%83%83%E3%82%B3%E5%B5%AF%E5%B3%A8%E9%A7%85" target="_blank" rel="noopener">📍 トロッコ嵯峨駅</a></span>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">15:30</span>
+        <span class="s-act">
+          <strong>🚃 トロッコ亀岡 → JR馬堀駅 → 京都駅</strong>
+          <small>馬堀駅まで歩いて約10分。JR嵯峨野線の京都行きで約30分、京都駅には16時半ごろ。</small>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">17:00</span>
+        <span class="s-act">
+          <strong>🏨 宿でひと休み</strong>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">19:00</span>
+        <span class="s-act">
+          <strong>🍽️ 夕食（京都駅のあたり）</strong>
+        </span>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<div class="section-divider">•&nbsp;•&nbsp;•</div>
+
+<!-- ════ DAY 8 ════ -->
+<section class="day-section" id="day8">
+  <div class="day-header">
+    <div class="day-label">DAY 8</div>
+    <div class="day-title">10月24日（土）京都 → 帰路</div>
+    <div class="transport-badge">🚄 のぞみ 京都 → 東京（約2時間15分・未予約）</div>
+  </div>
+  <div class="day-body">
+    <ul class="schedule">
+      <li>
+        <span class="s-time">07:30</span>
+        <span class="s-act">
+          <strong>🍳 朝食（ホテル）</strong>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">午前</span>
+        <span class="s-act">
+          <strong>🗺️ 京都観光（行き先は検討中）</strong>
+          <small>宿から世界遺産の東寺まで歩いて5分。</small>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">昼</span>
+        <span class="s-act">
+          <strong>🧳 チェックアウト・京都駅でお土産</strong>
+        </span>
+      </li>
+      <li>
+        <span class="s-time">午後</span>
+        <span class="s-act">
+          <strong>🚄 新幹線 京都 → 東京</strong>
+          <small>のぞみで約2時間15分。予約は「スマートEX」などで当日でも取れる。土曜なので早めに取ると安心。</small>
+        </span>
+      </li>
+    </ul>
+
+    <div class="home-banner">
+      <div class="big">🏠 🌺 ✨</div>
+      <p>おつかれさまでした！素敵な思い出をありがとう。</p>
+      <p style="font-size:.8rem; color:#888; margin-top:.3rem;">東京駅から自宅まで約1時間。ゆっくり帰ろう。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ════ FOOTER ════ -->
+<footer class="site-footer">
+  <p>🌀 台風30号のため、10/20 に宮古から関西へ予定を変更しました（石垣島の宿・レンタカーと、宮古→石垣の飛行機はキャンセル済み）。</p>
+  <p>⚠️ 交通の時刻・運賃と、お店・施設の営業状況は変わることがあります。最終確認は各リンク先（公式サイト）で行ってください。</p>
+  <p style="margin-top:.4rem; color:#bbb;">最終更新: 2026-10-20</p>
+</footer>
+
+</div><!-- /main-content -->
+</div><!-- /layout -->
+
+<!-- ════ Back to Top ════ -->
+<a href="#toc" class="back-to-top" title="目次へ戻る">▲</a>
+
+<!-- ════ 旅程マップ（データ） ════ -->
+<script>
+/* 座標は施設の代表点です。番地単位の正確な位置ではありません。 */
+window.TRIP_MAP = {
+  islands: [
+    {
+      id: "okinawa", name: "沖縄本島", emoji: "🌺",
+      fallbackCenter: [26.44, 127.85], fallbackZoom: 9,
+      spots: [
+        { id:"oki-naha-ap", kind:"airport", emoji:"✈️", name:"那覇空港",
+          lat:26.1966997, lng:127.6489521, day:"Day 1", dayHref:"#day1",
+          when:"10/17（土）12:20 着", desc:"JAL909便で到着。ここから沖縄本島の旅がはじまります。" },
+        { id:"oki-rentacar", kind:"rentacar", emoji:"🚗", name:"沖縄オープンレンタカー 那覇本店",
+          lat:26.208336, lng:127.688271, day:"Day 1", dayHref:"#day1",
+          when:"10/17（土）12:30 貸出 → 10/18（日）19:30 返却",
+          desc:"マツダ デミオ XD（禁煙車）。貸出した店舗にそのまま返却します。",
+          notes:[
+            "<strong>空港からの送迎あり</strong>（1泊以上の利用者限定・無料）",
+            "到着後に店舗へ電話 → 到着口を出て右突き当たり「<strong>14番レンタカー送迎場所</strong>」へ",
+            "通常15〜20分。ただし<strong>土日・祝前日は渋滞で40〜60分</strong>かかることあり（10/17は土曜）",
+            "空港送迎は19:00までに空港到着、直接来店は19:30まで",
+            "<strong>返却後は「国際通り」まで送ってもらえます</strong>（2泊目の宿は国際通り徒歩3分）"
+          ] },
+        { id:"oki-americanvillage", links:[{"label": "🔗 公式サイト", "url": "https://www.okinawa-americanvillage.com/"}, {"label": "📍 Googleマップ", "url": "https://www.google.com/maps/search/?api=1&query=%E7%BE%8E%E6%B5%9C%E3%82%A2%E3%83%A1%E3%83%AA%E3%82%AB%E3%83%B3%E3%83%93%E3%83%AC%E3%83%83%E3%82%B8"}], kind:"spot", emoji:"🎡", name:"美浜アメリカンビレッジ",
+          lat:26.3160339, lng:127.7565568, day:"Day 1", dayHref:"#day1",
+          when:"10/17（土）13:30", desc:"北谷町の海沿いの街。恩納村へ向かう途中。無料駐車場あり。" },
+        { id:"oki-atabees", links:[{"label": "🔗 アタビーズ 食べログ", "url": "https://tabelog.com/okinawa/A4703/A470304/47019850/"}, {"label": "📍 Googleマップ", "url": "https://www.google.com/maps/search/?api=1&query=%E3%83%81%E3%83%A3%E3%82%BF%E3%83%B3%20%E3%83%90%E3%83%BC%E3%82%AC%E3%83%BC%20%E3%83%99%E3%83%BC%E3%82%B9%20%E3%82%A2%E3%82%BF%E3%83%93%E3%83%BC%E3%82%BA"}, {"label": "🔗 ジェッタバーガー 食べログ", "url": "https://tabelog.com/okinawa/A4703/A470304/47007402/"}], kind:"spot", emoji:"🍔", name:"チャタン バーガー ベース アタビーズ",
+          lat:26.3156610, lng:127.7537607, day:"Day 1", dayHref:"#day1",
+          when:"10/17（土）13:30 昼食", desc:"アメリカンビレッジ内（シーサイドビル1F）のハンバーガー店。昼は15:00まで。" },
+        { id:"oki-manzamo", links:[{"label": "🔗 公式サイト", "url": "https://www.manzamo.jp/"}, {"label": "📍 Googleマップ", "url": "https://www.google.com/maps/search/?api=1&query=%E4%B8%87%E5%BA%A7%E6%AF%9B"}], kind:"spot", emoji:"🌅", name:"万座毛",
+          lat:26.5050087, lng:127.8502564, day:"Day 1", dayHref:"#day1",
+          when:"10/17（土）16:00", desc:"恩納村。象の鼻型の断崖絶壁と夕日の海。" },
+        { id:"oki-kafuu", kind:"hotel", emoji:"🛏️", name:"カフー リゾート フチャク コンド・ホテル",
+          lat:26.4566945, lng:127.8117011, day:"Day 1", dayHref:"#day1",
+          when:"10/17（土）泊", desc:"恩納村・西海岸。全室オーシャンビュー、ビーチ直結。" },
+        { id:"oki-sanshin", links:[{"label": "🔗 食べログ", "url": "https://tabelog.com/okinawa/A4703/A470303/47014264/"}, {"label": "📍 Googleマップ", "url": "https://www.google.com/maps/search/?api=1&query=%E4%B8%89%E7%B7%9A%E3%81%AE%E8%8A%B1%20%E6%81%A9%E7%B4%8D%E6%9D%91%E5%86%A8%E7%9D%80756-1"}], kind:"spot", emoji:"🪕", name:"純沖縄料理 三線の花",
+          lat:26.4534996, lng:127.8069268, day:"Day 1", dayHref:"#day1",
+          when:"10/17（土）18:15〜 予約済", desc:"恩納村冨着756-1。沖縄料理・海鮮。三線ライブ席（19:30までの時間制）。" },
+        { id:"oki-churaumi", links:[{"label": "🔗 公式サイト", "url": "https://churaumi.okinawa/"}, {"label": "📍 Googleマップ", "url": "https://www.google.com/maps/search/?api=1&query=%E6%B2%96%E7%B8%84%E7%BE%8E%E3%82%89%E6%B5%B7%E6%B0%B4%E6%97%8F%E9%A4%A8"}], kind:"spot", emoji:"🐋", name:"沖縄美ら海水族館・海洋博公園",
+          lat:26.6943689, lng:127.8780380, day:"Day 2", dayHref:"#day2",
+          when:"10/18（日）10:00", desc:"ジンベエザメ・マンタの大水槽「黒潮の海」は圧巻。イルカショー（無料）も。" },
+        { id:"oki-bise-cafe", links:[{"label": "🔗 公式サイト", "url": "https://cafe-cahayabulan.com/"}, {"label": "📍 Googleマップ", "url": "https://www.google.com/maps/search/?api=1&query=cahaya%20bulan%20%E5%82%99%E7%80%AC"}], kind:"spot", emoji:"☕", name:"備瀬のカフェ（cahaya bulan ほか）",
+          lat:26.7000000, lng:127.8790000, day:"Day 2", dayHref:"#day2",
+          when:"10/18（日）12:15 昼食", desc:"フクギ並木のそばのカフェで軽めの昼食。カフェアンテナ・琉果・古民家食堂ゆくるも近い。" },
+        { id:"oki-bise", links:[{"label": "🔗 観光情報", "url": "https://www.okinawastory.jp/spot/1348"}, {"label": "📍 Googleマップ", "url": "https://www.google.com/maps/search/?api=1&query=%E5%82%99%E7%80%AC%E3%81%AE%E3%83%95%E3%82%AF%E3%82%AE%E4%B8%A6%E6%9C%A8"}], kind:"spot", emoji:"🌳", name:"備瀬のフクギ並木",
+          lat:26.7014167, lng:127.8800364, day:"Day 2", dayHref:"#day2",
+          when:"10/18（日）13:30", desc:"水族館すぐ北。樹齢数百年のフクギが作る緑のトンネル。レンタサイクルで散策。" },
+        { id:"oki-kouri", links:[{"label": "🔗 観光協会", "url": "https://www.nakijinson.jp/spot.php?id=22&ct=1"}, {"label": "📍 Googleマップ", "url": "https://www.google.com/maps/search/?api=1&query=%E5%8F%A4%E5%AE%87%E5%88%A9%E5%A4%A7%E6%A9%8B"}], kind:"spot", emoji:"🌉", name:"古宇利島",
+          lat:26.7042510, lng:128.0180847, day:"Day 2", dayHref:"#day2",
+          when:"10/18（日）14:30", desc:"全長1,960mの古宇利大橋を渡る絶景ドライブ。ハートロック・古宇利ビーチ。" },
+        { id:"oki-hyatt", kind:"hotel", emoji:"🛏️", name:"ハイアット リージェンシー 那覇 沖縄",
+          lat:26.215223, lng:127.689835, day:"Day 2", dayHref:"#day2",
+          when:"10/18（日）泊", desc:"国際通り徒歩3分。全室禁煙・屋外プールあり。" },
+        { id:"oki-chouyouya", links:[{"label": "🔗 食べログ", "url": "https://tabelog.com/okinawa/A4701/A470101/47029666/"}, {"label": "📍 Googleマップ", "url": "https://www.google.com/maps/search/?api=1&query=%E6%9C%9D%E9%99%BD%E5%B1%8B%20%E9%82%A3%E8%A6%87%E5%B8%82%E4%B9%85%E8%8C%82%E5%9C%B02-19-17"}], kind:"spot", emoji:"🐷", name:"朝陽屋",
+          lat:26.2192415, lng:127.6837505, day:"Day 2", dayHref:"#day2",
+          when:"10/18（日）19:15〜 予約済", desc:"那覇市久茂地2-19-17。豚しゃぶ・沖縄料理。2時間制。" },
+        { id:"oki-kokusai", links:[{"label": "🔗 国際通り", "url": "https://naha-kokusaidori.okinawa/"}, {"label": "🔗 牧志公設市場", "url": "https://www.makishi-public-market.jp/"}, {"label": "📍 Googleマップ", "url": "https://www.google.com/maps/search/?api=1&query=%E7%AC%AC%E4%B8%80%E7%89%A7%E5%BF%97%E5%85%AC%E8%A8%AD%E5%B8%82%E5%A0%B4"}], kind:"spot", emoji:"🍶", name:"国際通り・第一牧志公設市場",
+          lat:26.2145462, lng:127.6882881, day:"Day 2", dayHref:"#day2",
+          when:"10/18（日）21:15", desc:"夕食のあと、国際通りで泡盛・お土産の買い物。" }
+      ]
+    },
+    {
+      id: "miyako", name: "宮古島", emoji: "🏝️",
+      fallbackCenter: [24.80, 125.25], fallbackZoom: 11,
+      spots: [
+        { id:"miy-ap", kind:"airport", emoji:"✈️", name:"宮古空港",
+          lat:24.7827675, lng:125.2961817, day:"Day 3", dayHref:"#day3",
+          when:"10/19（月）10:35 着", desc:"ANA1723便で那覇から。飛行時間は約50分。" },
+        { id:"miy-rentacar", kind:"rentacar", emoji:"🚗", name:"ユニバースレンタカー 宮古島空港店",
+          lat:24.787497, lng:125.299034, day:"Day 3", dayHref:"#day3",
+          when:"10/19（月）11:00 貸出 → 10/20（火）12:00 返却",
+          desc:"BMW Mスポーツ（禁煙車）。ガソリン満タン返し不要、補償込み。",
+          notes:[
+            "<strong>往路は空港から直接タクシーで店舗へ</strong>（約5分）",
+            "<strong>タクシー代は店舗が負担してくれます</strong>（空港からの直送のみ・要領収書）",
+            "タクシーが満車のときは店舗へ電話すれば送迎車が来ます",
+            "<strong>返却後は店舗から宮古空港まで送迎あり</strong>",
+            "下地島空港は送迎の対象外"
+          ] },
+        { id:"miy-koja", links:[{"label": "🔗 食べログ", "url": "https://tabelog.com/okinawa/A4705/A470503/47000106/"}, {"label": "📍 Googleマップ", "url": "https://www.google.com/maps/search/?api=1&query=%E5%8F%A4%E8%AC%9D%E3%81%9D%E3%81%B0%E5%B1%8B%20%E5%AE%AE%E5%8F%A4%E5%B3%B6"}], kind:"spot", emoji:"🍜", name:"古謝そば屋",
+          lat:24.7902939, lng:125.2844616, day:"Day 3", dayHref:"#day3",
+          when:"10/19（月）11:30 昼食（第1候補）", desc:"宮古そばの老舗。11:00〜16:00・水曜休み。" },
+        { id:"miy-daiwa", links:[{"label": "🔗 食べログ", "url": "https://tabelog.com/okinawa/A4705/A470503/47000267/"}, {"label": "📍 Googleマップ", "url": "https://www.google.com/maps/search/?api=1&query=%E5%A4%A7%E5%92%8C%E9%A3%9F%E5%A0%82%20%E5%AE%AE%E5%8F%A4%E5%B3%B6%20%E5%B9%B3%E8%89%AF%E8%A5%BF%E9%87%8C"}], kind:"spot", emoji:"🍜", name:"大和食堂",
+          lat:24.7997094, lng:125.2925889, day:"Day 3", dayHref:"#day3",
+          when:"10/19（月）11:30 昼食（次点）", desc:"宮古そばの老舗。9:40〜16:00・火曜休み。" },
+        { id:"miy-breeze", kind:"hotel", emoji:"🛏️", name:"ホテルブリーズベイマリーナ",
+          lat:24.7197812, lng:125.3252190, day:"Day 3", dayHref:"#day3",
+          when:"10/19（月）泊", desc:"シギラリゾートエリア。全室禁煙。宮古空港から車で約15分。" },
+        { id:"miy-maehama", links:[{"label": "🔗 観光協会", "url": "https://miyako-guide.net/spots/spots-785/"}, {"label": "📍 Googleマップ", "url": "https://www.google.com/maps/search/?api=1&query=%E4%B8%8E%E9%82%A3%E8%A6%87%E5%89%8D%E6%B5%9C%E3%83%93%E3%83%BC%E3%83%81"}], kind:"spot", emoji:"🏖️", name:"与那覇前浜ビーチ",
+          lat:24.7360451, lng:125.2611947, day:"Day 3", dayHref:"#day3",
+          when:"10/19（月）14:00 バナナボート＋SAP・18:09 日没",
+          desc:"東洋一とも称される白砂の浜。波が穏やかでSAP初心者でもOK。西向きなので夕日も。" },
+        { id:"miy-kurima", links:[{"label": "📍 竜宮城展望台", "url": "https://www.google.com/maps/search/?api=1&query=%E7%AB%9C%E5%AE%AE%E5%9F%8E%E5%B1%95%E6%9C%9B%E5%8F%B0%20%E6%9D%A5%E9%96%93%E5%B3%B6"}, {"label": "📍 楽園の果実", "url": "https://maps.app.goo.gl/8pdHPS5ApA99KWZf7"}], kind:"spot", emoji:"🌉", name:"来間島（竜宮城展望台・楽園の果実）",
+          lat:24.7205, lng:125.2515, day:"Day 3", dayHref:"#day3",
+          when:"10/19（月）15:45", desc:"バナナボートのあとの寄り道。来間大橋・竜宮城展望台・楽園の果実（友人のおすすめ）・長間浜。" },
+        { id:"miy-steak", links:[{"label": "🔗 ユキシオステーキ（予約）", "url": "https://yukishio-steak-miyako.foodre.jp/"}, {"label": "🔗 キャプテンメリアン", "url": "https://captain-marians.com/"}], kind:"spot", emoji:"🥩", name:"平良のステーキ店（ユキシオ・キャプテンメリアン・ダグズ）",
+          lat:24.8030, lng:125.2820, day:"Day 3", dayHref:"#day3",
+          when:"10/19（月）19:00 夕食", desc:"平良の市街地。どれかを予約。運転する人は飲めない。" },
+        { id:"miy-irabu", links:[{"label": "🔗 観光情報", "url": "https://www.miyakozima.net/tourist-info/irabubridge/"}, {"label": "📍 Googleマップ", "url": "https://www.google.com/maps/search/?api=1&query=%E4%BC%8A%E8%89%AF%E9%83%A8%E5%A4%A7%E6%A9%8B"}], kind:"spot", emoji:"🌉", name:"伊良部大橋",
+          lat:24.7967065, lng:125.2394594, day:"Day 4", dayHref:"#day4",
+          when:"10/20（火）09:20", desc:"全長3,540m、無料の橋として日本最長。海の上を走る絶景ドライブ。" },
+        { id:"miy-makiyama", links:[{"label": "🔗 観光協会", "url": "https://miyako-guide.net/spots/spots-874/"}, {"label": "📍 Googleマップ", "url": "https://www.google.com/maps/search/?api=1&query=%E7%89%A7%E5%B1%B1%E5%B1%95%E6%9C%9B%E5%8F%B0"}], kind:"spot", emoji:"🗼", name:"牧山展望台",
+          lat:24.8177845, lng:125.2183222, day:"Day 4", dayHref:"#day4",
+          when:"10/20（火）09:40", desc:"伊良部島の最高所。3つの橋を一望。" },
+        { id:"miy-toriike", links:[{"label": "🔗 観光情報", "url": "https://miyakozima.net/tourist-info/toriike/"}, {"label": "📍 Googleマップ", "url": "https://www.google.com/maps/search/?api=1&query=%E9%80%9A%E3%82%8A%E6%B1%A0%20%E4%BC%8A%E8%89%AF%E9%83%A8%E5%B3%B6%20%E4%B8%8B%E5%9C%B0%E5%B3%B6"}], kind:"spot", emoji:"🕳️", name:"通り池",
+          lat:24.8242599, lng:125.1368284, day:"Day 4", dayHref:"#day4",
+          when:"10/20（火）10:20", desc:"国の名勝・天然記念物。地下で海と繋がる神秘的な二つの池。" },
+        { id:"miy-sawada", links:[{"label": "🔗 観光協会", "url": "https://miyako-guide.net/spots/spots-811/"}, {"label": "📍 Googleマップ", "url": "https://www.google.com/maps/search/?api=1&query=%E4%BD%90%E5%92%8C%E7%94%B0%E3%81%AE%E6%B5%9C"}], kind:"spot", emoji:"🪨", name:"佐和田の浜",
+          lat:24.8405237, lng:125.1600182, day:"Day 4", dayHref:"#day4",
+          when:"10/20（火）11:00", desc:"津波で運ばれた巨岩が点在する不思議な浜。日本の渚百選。" },
+        { id:"miy-ap-out", kind:"airport", emoji:"✈️", name:"宮古空港（出発）",
+          lat:24.7827675, lng:125.2961817, day:"Day 4", dayHref:"#day4",
+          when:"10/20（火）13:25 発", desc:"NH1750便で関西空港へ。台風を避けて石垣島から予定を変更。" }
+      ]
+    },
+    {
+      id: "kansai", name: "関西", emoji: "♨️",
+      fallbackCenter: [34.80, 135.45], fallbackZoom: 9,
+      spots: [
+        { id:"kan-kix", kind:"airport", emoji:"✈️", name:"関西空港",
+          lat:34.4320, lng:135.2304, day:"Day 4", dayHref:"#day4",
+          when:"10/20（火）15:40 着", desc:"NH1750便で宮古から。リムジンバスで梅田へ約60分。" },
+        { id:"kan-hanshin", kind:"hotel", emoji:"🛏️", name:"ホテル阪神アネックス大阪",
+          links:[{"label": "🔗 楽天トラベル", "url": "https://travel.rakuten.co.jp/HOTEL/168596/168596.html"}],
+          lat:34.6962, lng:135.4848, day:"Day 4", dayHref:"#day4",
+          when:"10/20（火）泊", desc:"JR福島駅から徒歩約3分。朝食付き。翌日は大阪駅JR高速バスターミナルから有馬温泉行きの高速バス。" },
+        { id:"kan-zuien", kind:"hotel", emoji:"🛏️", name:"有馬温泉 中の坊瑞苑",
+          links:[{"label": "🔗 楽天トラベル", "url": "https://travel.rakuten.co.jp/HOTEL/25288/25288.html"}],
+          lat:34.7978, lng:135.2483, day:"Day 5", dayHref:"#day5",
+          when:"10/21（水）泊", desc:"数寄屋造りの和室。朝食付き・夕食は宿の外で。" },
+        { id:"kan-arima", kind:"spot", emoji:"♨️", name:"有馬温泉（金の湯）",
+          links:[{"label": "🔗 有馬温泉観光協会", "url": "https://www.arima-onsen.com/"}, {"label": "📍 Googleマップ", "url": "https://www.google.com/maps/search/?api=1&query=%E9%87%91%E3%81%AE%E6%B9%AF%20%E6%9C%89%E9%A6%AC%E6%B8%A9%E6%B3%89"}],
+          lat:34.7978, lng:135.2477, day:"Day 5", dayHref:"#day5",
+          when:"10/21（水）16:00", desc:"金泉・銀泉の外湯と湯本坂の温泉街。" },
+        { id:"kan-kyoto", kind:"spot", emoji:"🚉", name:"京都駅",
+          lat:34.9858, lng:135.7588, day:"Day 6", dayHref:"#day6",
+          when:"10/22（木）12:45ごろ 着", desc:"有馬温泉11:30発の直通高速バス（予約済）で八条口（南口）に着く。宿は八条西口から徒歩約10分。宇治・嵐山へのJRも、帰りの新幹線もここから。" },
+        { id:"kan-byodoin", kind:"spot", emoji:"🪷", name:"平等院鳳凰堂",
+          links:[{"label": "🔗 平等院", "url": "https://www.byodoin.or.jp/"}, {"label": "📍 Googleマップ", "url": "https://www.google.com/maps/search/?api=1&query=%E5%B9%B3%E7%AD%89%E9%99%A2"}],
+          lat:34.8893, lng:135.8077, day:"Day 6", dayHref:"#day6",
+          when:"10/22（木）14:30", desc:"宇治。京都駅からJR奈良線で約20分。鳳凰堂の内部拝観は別料金・20分ごとの入れ替え制。" },
+        { id:"kan-doi", kind:"spot", emoji:"🍚", name:"竈炊き立てごはん 土井 京都駅八条口店",
+          links:[{"label": "🔗 食べログ", "url": "https://tabelog.com/kyoto/A2601/A260101/26026058/"}],
+          lat:34.9846, lng:135.7593, day:"Day 6", dayHref:"#day6",
+          when:"10/22（木）19:00 夕食", desc:"京都駅八条口すぐ・アスティロード京都 1F。竈炊きのごはん。" },
+        { id:"kan-loisir", kind:"hotel", emoji:"🛏️", name:"ロワジールホテル京都東寺",
+          links:[{"label": "🔗 楽天トラベル", "url": "https://travel.rakuten.co.jp/HOTEL/187986/187986.html"}],
+          lat:34.9809, lng:135.7535, day:"Day 6", dayHref:"#day6",
+          when:"10/22（木）・10/23（金）泊", desc:"京都駅 八条西口から徒歩約10分。朝食付き・サウナ付き大浴場。" },
+        { id:"kan-yasaka", kind:"spot", emoji:"⛩️", name:"八坂神社",
+          links:[{"label": "🔗 八坂神社", "url": "https://www.yasaka-jinja.or.jp/"}, {"label": "📍 Googleマップ", "url": "https://www.google.com/maps/search/?api=1&query=%E5%85%AB%E5%9D%82%E7%A5%9E%E7%A4%BE"}],
+          lat:35.0036, lng:135.7785, day:"Day 7", dayHref:"#day7",
+          when:"10/23（金）09:45（時間があれば）", desc:"ぎをん小森の前に。お店まで歩いて約10分。" },
+        { id:"kan-komori", kind:"spot", emoji:"🍡", name:"ぎをん小森",
+          links:[{"label": "🔗 食べログ", "url": "https://tabelog.com/kyoto/A2601/A260301/26000280/"}, {"label": "📍 Googleマップ", "url": "https://www.google.com/maps/search/?api=1&query=%E3%81%8E%E3%82%92%E3%82%93%E5%B0%8F%E6%A3%AE"}],
+          lat:35.0052, lng:135.7743, day:"Day 7", dayHref:"#day7",
+          when:"10/23（金）10:40 並ぶ → 11:00 わらび餅", desc:"祇園白川沿いの甘味処。開店前から並ぶ。" },
+        { id:"kan-arashiyama", kind:"spot", emoji:"🎋", name:"嵐山（渡月橋・竹林の小径）",
+          links:[{"label": "📍 渡月橋", "url": "https://www.google.com/maps/search/?api=1&query=%E6%B8%A1%E6%9C%88%E6%A9%8B"}, {"label": "📍 竹林の小径", "url": "https://www.google.com/maps/search/?api=1&query=%E7%AB%B9%E6%9E%97%E3%81%AE%E5%B0%8F%E5%BE%84"}],
+          lat:35.0129, lng:135.6777, day:"Day 7", dayHref:"#day7",
+          when:"10/23（金）12:30〜", desc:"ぎをん小森のあと阪急で嵐山へ。渡月橋・天龍寺・竹林の小径。" },
+        { id:"kan-torokko", kind:"spot", emoji:"🚂", name:"嵯峨野トロッコ列車（トロッコ嵯峨駅）",
+          links:[{"label": "🔗 嵯峨野観光鉄道", "url": "https://www.sagano-kanko.co.jp/"}],
+          lat:35.0181, lng:135.6812, day:"Day 7", dayHref:"#day7",
+          when:"10/23（金）15:02 発（予約済）", desc:"トロッコ亀岡まで約25分。帰りはJR馬堀駅から京都駅へ直行。" },
+        { id:"kan-yudofu", kind:"spot", emoji:"🍲", name:"湯豆腐（西山艸堂・天龍寺の塔頭）",
+          links:[{"label": "🔗 西山艸堂（るるぶ）", "url": "https://rurubu.jp/andmore/spot/80027229"}, {"label": "🔗 湯豆腐 嵯峨野（ネット予約）", "url": "https://www.hotpepper.jp/strJ000108819/"}],
+          lat:35.0156, lng:135.6745, day:"Day 7", dayHref:"#day7",
+          when:"10/23（金）12:30ごろ 昼食（候補）", desc:"昼食は道中で選ぶ。湯豆腐なら西山艸堂か湯豆腐 嵯峨野。" }
+      ]
+    }
+  ]
+};
+</script>
+
+<!-- ════ 旅程マップ（ロジック） ════ -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script>
+(function(){
+  "use strict";
+  var DATA = window.TRIP_MAP;
+  var map = null, layers = {}, markers = {}, activeIsland = null, selectedSpot = null;
+  var canHover = window.matchMedia && window.matchMedia('(hover: hover)').matches;
+
+  function byId(id){ return document.getElementById(id); }
+  function spotsOf(id){
+    var is = DATA.islands.filter(function(i){ return i.id === id; })[0];
+    return is ? is.spots : [];
+  }
+
+  /* 座標の取り違えを機械的に検出する（沖縄県・関西の範囲から外れたら警告） */
+  function validateSpots(){
+    var msgs = [], seen = {};
+    DATA.islands.forEach(function(is){
+      is.spots.forEach(function(s){
+        if (seen[s.id]) msgs.push('id重複: ' + s.id);
+        seen[s.id] = 1;
+        if (typeof s.lat !== 'number' || typeof s.lng !== 'number') msgs.push('座標なし: ' + s.name);
+        else if (!((s.lat >= 23.9 && s.lat <= 27.0 && s.lng >= 122.9 && s.lng <= 128.5) ||
+                   (s.lat >= 34.3 && s.lat <= 35.2 && s.lng >= 135.0 && s.lng <= 136.0)))
+          msgs.push('座標が範囲外: ' + s.name + ' (' + s.lat + ',' + s.lng + ')');
+        if (s.dayHref && !byId(s.dayHref.slice(1))) msgs.push('リンク先なし: ' + s.dayHref + ' (' + s.name + ')');
+      });
+    });
+    if (msgs.length) console.warn('[旅程マップ]', msgs);
+  }
+
+  /* 同じ座標に複数ピンが重なると読めないので円状に散らす */
+  function spreadOverlaps(spots){
+    var g = {};
+    spots.forEach(function(s){
+      var k = s.lat.toFixed(4) + ',' + s.lng.toFixed(4);
+      (g[k] = g[k] || []).push(s);
+    });
+    Object.keys(g).forEach(function(k){
+      var arr = g[k];
+      if (arr.length < 2){ arr[0]._lat = arr[0].lat; arr[0]._lng = arr[0].lng; return; }
+      var R = 0.004;
+      arr.forEach(function(s, i){
+        var th = (2 * Math.PI * i) / arr.length;
+        s._lat = s.lat + R * Math.cos(th);
+        s._lng = s.lng + R * Math.sin(th) / Math.cos(s.lat * Math.PI / 180);
+      });
+    });
+  }
+
+  function buildLayer(island){
+    var group = L.layerGroup();
+    spreadOverlaps(island.spots);
+    island.spots.forEach(function(s, idx){
+      var cls = 'pin pin-' + s.kind;
+      var m = L.marker([s._lat, s._lng], {
+        icon: L.divIcon({ className:'', iconSize:[0,0],
+                          html:'<div class="' + cls + '" data-spot="' + s.id + '">' + s.emoji + ' ' + (idx+1) + '</div>' }),
+        zIndexOffset: s.kind === 'spot' ? 0 : 300,
+        keyboard: false
+      });
+      /* タッチ端末ではツールチップが地図を覆うだけなので付けない（情報はカードに集約） */
+      if (canHover) m.bindTooltip(s.name, { className:'spot-tip', direction:'auto', opacity:1 });
+      m.on('click', function(){ selectSpot(s.id, true); });
+      m.addTo(group);
+      markers[s.id] = m;
+    });
+    return group;
+  }
+
+  function renderChips(island){
+    byId('spotChips').innerHTML = island.spots.map(function(s, i){
+      return '<li><button type="button" class="spot-chip" data-spot="' + s.id + '">' +
+             (i+1) + ' ' + s.emoji + ' ' + s.name + '</button></li>';
+    }).join('');
+  }
+
+  function showCard(s){
+    var card = byId('spotCard');
+    if (!s){
+      card.className = 'spot-card';
+      card.innerHTML = '<p class="sc-placeholder">ピンをタップすると、ここに詳細が表示されます</p>';
+      return;
+    }
+    var h = '<p class="sc-when">' + s.day + '　' + s.when + '</p>';
+    h += '<p class="sc-name">' + s.emoji + ' ' + s.name + '</p>';
+    if (s.desc) h += '<p class="sc-desc">' + s.desc + '</p>';
+    if (s.notes && s.notes.length){
+      h += '<ul class="sc-notes">' + s.notes.map(function(n){ return '<li>' + n + '</li>'; }).join('') + '</ul>';
+    }
+    if (s.links && s.links.length){
+      h += '<p class="sc-links">' + s.links.map(function(l){
+        return '<a href="' + l.url + '" target="_blank" rel="noopener">' + l.label + '</a>';
+      }).join('') + '</p>';
+    }
+    if (s.dayHref) h += '<a class="sc-link" href="' + s.dayHref + '">' + s.day + ' の行程を見る ›</a>';
+    card.className = 'spot-card is-' + s.kind;
+    card.innerHTML = h;
+  }
+
+  function selectSpot(id, pan){
+    selectedSpot = id;
+    var s = spotsOf(activeIsland).filter(function(x){ return x.id === id; })[0];
+    if (!s) return;
+
+    Array.prototype.forEach.call(document.querySelectorAll('.pin'), function(el){
+      el.classList.toggle('selected', el.getAttribute('data-spot') === id);
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('.spot-chip'), function(el){
+      var on = el.getAttribute('data-spot') === id;
+      el.setAttribute('aria-current', on ? 'true' : 'false');
+      if (on && el.scrollIntoView) el.scrollIntoView({ block:'nearest', inline:'center', behavior:'smooth' });
+    });
+
+    showCard(s);
+    if (pan && map) map.panTo([s._lat, s._lng], { animate:true });
+    /* すでに見えていれば動かない。隠れているときだけ最小限スクロールする */
+    var card = byId('spotCard');
+    if (card.scrollIntoView) card.scrollIntoView({ block:'nearest', behavior:'smooth' });
+  }
+
+  function selectIsland(id){
+    var island = DATA.islands.filter(function(i){ return i.id === id; })[0];
+    if (!island) return;
+    activeIsland = id;
+
+    Array.prototype.forEach.call(document.querySelectorAll('.island-tab'), function(b){
+      b.setAttribute('aria-selected', String(b.getAttribute('data-island') === id));
+    });
+
+    if (map){
+      Object.keys(layers).forEach(function(k){
+        if (map.hasLayer(layers[k])) map.removeLayer(layers[k]);
+      });
+      layers[id].addTo(map);
+      var pts = island.spots.map(function(s){ return [s._lat, s._lng]; });
+      if (pts.length) map.flyToBounds(L.latLngBounds(pts), { padding:[40,40], maxZoom:13, duration:.6 });
+      else map.setView(island.fallbackCenter, island.fallbackZoom);
+    }
+
+    renderChips(island);
+    showCard(null);
+    selectedSpot = null;
+  }
+
+  function init(){
+    byId('islandTabs').innerHTML = DATA.islands.map(function(is){
+      return '<li role="presentation"><button type="button" class="island-tab" role="tab" ' +
+             'data-island="' + is.id + '" aria-selected="false">' + is.emoji + ' ' + is.name + '</button></li>';
+    }).join('');
+
+    document.addEventListener('click', function(e){
+      var tab = e.target.closest ? e.target.closest('.island-tab') : null;
+      if (tab){ selectIsland(tab.getAttribute('data-island')); return; }
+      var chip = e.target.closest ? e.target.closest('.spot-chip') : null;
+      if (chip) selectSpot(chip.getAttribute('data-spot'), true);
+    });
+
+    validateSpots();
+
+    /* Leaflet が読めなくても本文は読める形にしておく */
+    if (typeof L === 'undefined'){
+      byId('map').style.display = 'none';
+      byId('mapError').style.display = 'block';
+      DATA.islands.forEach(function(is){ spreadOverlaps(is.spots); });
+      selectIsland(DATA.islands[0].id);
+      return;
+    }
+
+    map = L.map('map', { scrollWheelZoom:false })   // 縦長ページなのでホイールズームは無効
+            .setView(DATA.islands[0].fallbackCenter, DATA.islands[0].fallbackZoom);
+
+    var gsiPale = L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png', {
+      maxZoom:18, attribution:'&copy; <a href="https://maps.gsi.go.jp/development/ichiran.html">国土地理院</a>'
+    });
+    var gsiStd = L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png', {
+      maxZoom:18, attribution:'&copy; <a href="https://maps.gsi.go.jp/development/ichiran.html">国土地理院</a>'
+    });
+    var osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom:19, attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map);
+    L.control.layers({ 'OpenStreetMap': osm, '地理院 淡色': gsiPale, '地理院 標準': gsiStd }).addTo(map);
+
+    var failed = false;
+    [gsiPale, gsiStd, osm].forEach(function(layer){
+      layer.on('tileerror', function(){
+        if (failed || !map.hasLayer(layer)) return;
+        failed = true;
+        byId('mapError').style.display = 'block';
+      });
+    });
+
+    /* スマホで縦スクロールが地図に吸われないよう、1本指はページのスクロールに譲る */
+    if (!canHover){
+      map.dragging.disable();
+      var el = byId('map'), hint = byId('panHint');
+      el.addEventListener('touchstart', function(e){
+        if (e.touches.length >= 2){ map.dragging.enable(); hint.classList.remove('show'); }
+        else { map.dragging.disable(); hint.classList.add('show'); }
+      }, { passive:true });
+      el.addEventListener('touchend', function(){ hint.classList.remove('show'); }, { passive:true });
+    }
+
+    DATA.islands.forEach(function(is){ layers[is.id] = buildLayer(is); });
+
+    var want = window.location.hash.slice(1);
+    var valid = DATA.islands.some(function(i){ return i.id === want; });
+    selectIsland(valid ? want : DATA.islands[0].id);
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+</script>
+
+</body>
+</html>
